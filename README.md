@@ -14,14 +14,10 @@ ADL graph anomaly project
 
     https://arxiv.org/abs/2010.05903
 
-"A Comprehensive Survey on Graph Anomaly Detection with Deep Learning"
----
-
-    https://arxiv.org/abs/2106.07178
-
-
 **Anomaly Detection**
 ```
+**A Comprehensive Survey on Graph Anomaly Detection with Deep Learning**
+    https://arxiv.org/abs/2106.07178
 **Anomaly Detection on Attributed Networks via Contrastive Self-Supervised Learning**
     https://arxiv.org/abs/2103.00113
 ```
@@ -31,7 +27,7 @@ ADL graph anomaly project
     https://arxiv.org/abs/2003.01604
 ```
 
-**GNN **
+**GNN**
 
 ```
 **overview**
@@ -40,7 +36,7 @@ ADL graph anomaly project
     https://arxiv.org/abs/1901.00596
 ```
 
-**Datasets**
+**Data & Datasets**
 
 ```
 Datasets
