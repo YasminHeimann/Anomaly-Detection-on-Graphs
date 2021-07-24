@@ -20,24 +20,32 @@ ADL graph anomaly project
     https://arxiv.org/abs/2106.07178
 
 
-**More Articles**
+**Anomaly Detection**
 ```
-**Data Augmentation for Graph Neural Networks, 14 June 2021**
-    https://arxiv.org/abs/2006.06830
-**A Comprehensive Survey on Graph Neural Networks, 4 Dec 2019**
-    https://arxiv.org/abs/1901.00596
 **Anomaly Detection on Attributed Networks via Contrastive Self-Supervised Learning**
     https://arxiv.org/abs/2103.00113
 ```
+**SSL on Graphs**
+```
+**Self-Supervised Graph Representation Learning via Global Context Prediction**
+    https://arxiv.org/abs/2003.01604
+```
 
-**GNN overview**
+**GNN **
 
 ```
-https://www.youtube.com/watch?v=8owQBFAHw7E&t=1980s&ab_channel=TensorFlow
+**overview**
+    https://www.youtube.com/watch?v=8owQBFAHw7E&t=1980s&ab_channel=TensorFlow
+**A Comprehensive Survey on Graph Neural Networks, 4 Dec 2019**
+    https://arxiv.org/abs/1901.00596
 ```
 
 **Datasets**
 
 ```
-https://ogb.stanford.edu/
+Datasets
+    https://ogb.stanford.edu/
+**Data Augmentation for Graph Neural Networks, 14 June 2021**
+    https://arxiv.org/abs/2006.06830
+
 ```
