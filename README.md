@@ -19,10 +19,16 @@ ADL graph anomaly project
 
     https://arxiv.org/abs/2106.07178
 
-"Anomaly Detection on Attributed Networks via Contrastive Self-Supervised Learning"
----
 
+**More Articles**
+```
+Data Augmentation for Graph Neural Networks, 14 June 2021
+    https://arxiv.org/abs/2006.06830
+A Comprehensive Survey on Graph Neural Networks, 4 Dec 2019
+    https://arxiv.org/abs/1901.00596
+Anomaly Detection on Attributed Networks via Contrastive Self-Supervised Learning
     https://arxiv.org/abs/2103.00113
+```
 
 **GNN overview**
 
