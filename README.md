@@ -35,6 +35,7 @@ ADL graph anomaly project
 
 --SSL on graphs papers summary:
     https://github.com/ChandlerBang/awesome-self-supervised-gnn
+    https://githubmemory.com/repo/DLwbm123/awesome-self-supervised-learning-for-graphs
 ```
 
 **GNN**
