@@ -32,6 +32,9 @@ ADL graph anomaly project
     https://arxiv.org/abs/2103.00111
 **Self-Supervised Graph Representation Learning via Global Context Prediction, 3 Mar 2020**
     https://arxiv.org/abs/2003.01604
+
+--SSL on graphs papers summary:
+    https://github.com/ChandlerBang/awesome-self-supervised-gnn
 ```
 
 **GNN**
