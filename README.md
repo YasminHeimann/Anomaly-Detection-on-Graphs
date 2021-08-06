@@ -18,7 +18,9 @@ ADL graph anomaly project
 **Anomaly Detection**
 
 [**A Comprehensive Survey on Graph Anomaly Detection with Deep Learning**](https://arxiv.org/abs/2010.05903)
+
 [**Anomaly Detection on Attributed Networks via Contrastive Self-Supervised Learning**](https://arxiv.org/abs/2103.00113)
+
 [**Anomaly Detection in -Dynamic Graphs- via Transformer, 18 June 2021**](https://arxiv.org/abs/2106.09876)
 
 [comment]: <> (**A Comprehensive Survey on Graph Anomaly Detection with Deep Learning**)
@@ -35,7 +37,9 @@ ADL graph anomaly project
 
 **SSL on Graphs**
 [**Contrastive and Generative Graph Convolutional Networks for Graph-based Semi-Supervised Learning, 19 Sep 2020**](https://arxiv.org/pdf/2009.07111.pdf)
+
 [**Graph Self-Supervised Learning: A Survey, 27 Feb 2021**](    https://arxiv.org/abs/2103.00111)
+
 [**Self-Supervised Graph Representation Learning via Global Context Prediction, 3 Mar 2020**](    https://arxiv.org/abs/2003.01604)
 
 ```
