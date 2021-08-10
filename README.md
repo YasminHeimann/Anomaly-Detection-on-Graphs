@@ -1,6 +1,14 @@
 # Graph_Anomaly
 
-ADL graph anomaly project
+
+Anomaly Detection on Graphs
+```
+Detecting anomalies in graphs (e.g. networks) is very important. 
+This project will apply the general ideas in PANDA to graphs. 
+The challenge is to:
+i) learning strong features in a self-supervised way or transfer them from some other task 
+ii) design a suitable objective for finetuning the feature for anomaly detection on the target data.
+```
 
 # Relevant Articles
 
@@ -53,6 +61,7 @@ ADL graph anomaly project
 ```
 **overview**
     https://www.youtube.com/watch?v=8owQBFAHw7E&t=1980s&ab_channel=TensorFlow
+
 **A Comprehensive Survey on Graph Neural Networks, 4 Dec 2019**
     https://arxiv.org/abs/1901.00596
     
@@ -70,7 +79,7 @@ Datasets
     https://arxiv.org/abs/2006.06830
 ```
 
-**General*"
+**General**
 ```
 Shirui Pan articles
     https://arxiv.org/search/cs?searchtype=author&query=Pan%2C+S
