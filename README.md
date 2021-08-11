@@ -1,7 +1,7 @@
 # Graph_Anomaly
 
 
-Anomaly Detection on Graphs
+**Anomaly Detection on Graphs**
 ```
 Detecting anomalies in graphs (e.g. networks) is very important. 
 This project will apply the general ideas in PANDA to graphs. 
@@ -11,20 +11,24 @@ ii) design a suitable objective for finetuning the feature for anomaly detection
 ```
 
 # Relevant Articles
-
-"Self-supervised Learning on Graphs: Deep Insights and New Directions"
+**Source articles**
 ---
 
-[https://arxiv.org/pdf/2006.10141.pdf](https://arxiv.org/pdf/2006.10141.pdf)
+
+**Graphs SSL:** 
+
+[***Self-supervised Learning on Graphs: Deep Insights and New Directions***](https://arxiv.org/pdf/2006.10141.pdf)
+
+>[SelfTask-GNN GitHub](https://github.com/ChandlerBang/SelfTask-GNN)
+
+**PANDA anomaly detection:** 
+
+[***PANDA: Adapting Pretrained Features for Anomaly Detection and Segmentation***](https://arxiv.org/abs/2010.05903)
 
 
-"PANDA: Adapting Pretrained Features for Anomaly Detection and Segmentation"
----
-
-[https://arxiv.org/abs/2010.05903](https://arxiv.org/abs/2010.05903)
 
 **Anomaly Detection**
-
+---
 [***A Comprehensive Survey on Graph Anomaly Detection with Deep Learning***](https://arxiv.org/abs/2010.05903)
 
 [***Anomaly Detection on Attributed Networks via Contrastive Self-Supervised Learning***](https://arxiv.org/abs/2103.00113)
@@ -44,17 +48,20 @@ ii) design a suitable objective for finetuning the feature for anomaly detection
 [comment]: <> (    https://arxiv.org/abs/2106.09876)
 
 **SSL on Graphs**
+---
 [***Contrastive and Generative Graph Convolutional Networks for Graph-based Semi-Supervised Learning, 19 Sep 2020***](https://arxiv.org/pdf/2009.07111.pdf)
 
 [***Graph Self-Supervised Learning: A Survey, 27 Feb 2021***](    https://arxiv.org/abs/2103.00111)
 
 [***Self-Supervised Graph Representation Learning via Global Context Prediction, 3 Mar 2020***](    https://arxiv.org/abs/2003.01604)
 
-```
---SSL on graphs papers summary:
+
+>SSL on graphs papers summary:
     https://github.com/ChandlerBang/awesome-self-supervised-gnn
     https://githubmemory.com/repo/DLwbm123/awesome-self-supervised-learning-for-graphs
-```
+
+
+# Relevant Information Sources
 
 **GNN**
 
@@ -75,8 +82,9 @@ ii) design a suitable objective for finetuning the feature for anomaly detection
 Strategies for Pre-training Graph Neural Networks, ICLR 2020
     https://arxiv.org/abs/1905.12265
     https://github.com/snap-stanford/pretrain-gnns/
-
-
+    
+SSL tasks for Graphs, from article 1:
+    https://github.com/ChandlerBang/SelfTask-GNN
 ```
 
 **Data & Datasets**
