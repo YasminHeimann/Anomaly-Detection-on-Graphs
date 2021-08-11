@@ -69,6 +69,15 @@ ii) design a suitable objective for finetuning the feature for anomaly detection
     https://arxiv.org/abs/2103.04683
     
 ```
+**Pre-training GNN methods**
+
+```
+Strategies for Pre-training Graph Neural Networks, ICLR 2020
+    https://arxiv.org/abs/1905.12265
+    https://github.com/snap-stanford/pretrain-gnns/
+
+
+```
 
 **Data & Datasets**
 
