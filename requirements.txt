@@ -1,1 +1,13 @@
-numpy~=1.16.2
+networkx
+numpy
+pandas
+torch
+scipy
+scikit_learn_extra
+numba
+matplotlib
+metis
+tqdm
+ipdb
+scikit_learn
+tensorboardX
