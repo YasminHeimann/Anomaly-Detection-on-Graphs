@@ -1,0 +1,71 @@
+Category Dataset #Nodes #Edges #FEAT #ANOM REF URL
+[89], [96], [103],
+ACM 16484 71980 8337 -
+http://www.arnetminer.org/open-academic-graph
+[104]
+Citation
+[69], [79], [80],
+Cora 2708 5249 1433 -
+http://linqs.cs.umd.edu/projects/projects/lbc
+Networks
+[94], [107]
+[11], [79], [80],
+Citeseer 3327 4732 3703 -
+http://linqs.cs.umd.edu/projects/projects/lbc
+[107]
+[79], [80], [94],
+Pubmed 19717 44338 500 -
+http://linqs.cs.umd.edu/projects/projects/lbc
+[107]
+[11], [69], [74],
+DBLP - - - -
+http://www.informatik.uni-trier.de/˜ley/db/
+[81], [124]
+[37], [39], [65], [98], [101],
+Enron 13533 176967 20 5 https://www.cs.cmu.edu/˜./enron/
+[102], [124],
+Social
+[125], [129]
+Networks UCI - - - -
+[81], [82], [117]
+http://archive.ics.uci.edu/ml
+Message Digg
+-
+-
+-
+-
+[81], [82], [117]
+http://konect.uni-koblenz.de/networks Wikipedia
+-
+-
+-
+-
+[65], [98], [109]
+http://wikipedia.ramselehof.de/wikiblame.php
+[39],
+Co-purchasing
+Disney 124 334 30 6
+[100]–[102],
+https://www.ipd.kit.edu/mitarbeiter/muellere/consub/
+Networks
+[125]
+[7], [25], [69], Amazon 314824 882930 28 6296
+[70], [73], [74],
+https://www.ipd.kit.edu/mitarbeiter/muellere/consub/
+[101]
+Transportation
+New York
+[37], [108],
+- - - - http://www.nyc.gov/html/tlc/html/about/triprecorddata.shtml
+Networks
+City Taxi
+[123]
+*
+
+
+
+git clone https://github.com/ChandlerBang/SelfTask-GNN.git
+cd SelfTask-GNN
+virtualenv venv --python python3
+source venv/bin/activate
+pip install -r requirements.txt

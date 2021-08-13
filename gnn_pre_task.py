@@ -1,69 +1,21 @@
-import dgl
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
-# %% md
-
-import dgl
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-# %%
-
-import dgl.data
-
-dataset = dgl.data.CoraGraphDataset()
-print('\nNumber of categories:', dataset.num_classes)
-# cora db has one graph
-g = dataset[0]
-print('Node features')
-print(g.ndata)
-print('Edge features')
-print(g.edata)
-
-# %% md
+import models
+import panda_utils
 
 
-from dgl.nn import GraphConv
-
-
-class GCN(nn.Module):
-    def __init__(self, in_feats, h_feats, num_classes):
-        super(GCN, self).__init__()
-        self.conv1 = dgl.nn.GraphConv(in_feats, h_feats)
-        self.conv2 = GraphConv(h_feats, num_classes)
-
-    def forward(self, g):
-        in_feat = g.ndata['feat']
-
-        h = self.conv1(g, in_feat)
-        h = F.relu(h)
-        h = self.conv2(g, h)
-        return h
-
-
-# Create the model with given dimensions
-print("features dim: ", g.ndata['feat'].shape[1])
-
-
-# model = GCN(g.ndata['feat'].shape[1], 16, dataset.num_classes)
-
-
-# %%
-
-
-def train(g, model):
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+def train(g, model, args):  # epocs=100, lr=0.01
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     best_val_acc = 0
     best_test_acc = 0
 
-    features = g.ndata['feat']
+    # features = g.ndata['feat']
     labels = g.ndata['label']
     train_mask = g.ndata['train_mask']
     val_mask = g.ndata['val_mask']
     test_mask = g.ndata['test_mask']
-    for e in range(100):
+    for e in range(args.epocs):
         # Forward
         logits = model(g)
 
@@ -96,18 +48,33 @@ def train(g, model):
                 e, loss, val_acc, best_val_acc, test_acc, best_test_acc))
 
 
-# %%
+def get_model_architecture(model, g, dataset):
+    if model == 'gcn':
+        return models.GCN(g.ndata['feat'].shape[1], 16, dataset.num_classes)  # .to('cuda')
+    else:
+        print('Default model architecture is gcn')
+        return models.GCN(g.ndata['feat'].shape[1], 16, dataset.num_classes)  # .to('cuda')
+
 
 # g = g.to('cuda')
-def get_NODC_model():
-    model = GCN(g.ndata['feat'].shape[1], 16, dataset.num_classes)  # .to('cuda')
-    train(g, model)
+def get_node_class_model(args):
+    # Create the model with given dimensions
+    g, dataset = panda_utils.get_graph('cora')
+    print("features dim: ", g.ndata['feat'].shape[1])
+
+    model = get_model_architecture(args.model, g, dataset)
+    train(g, model, args)
+
     print("hello gur")
     print("\nfinished training GCN\n")
     return model
 
-# %%
+
+def get_model(args):
+    if args.task == 'node_class':
+        return get_node_class_model(args)
+    else:
+        print('Default model is node classification with gcn')
+        return get_node_class_model(args)
 
 
-
-# %%
