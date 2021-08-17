@@ -29,6 +29,14 @@ def freeze_parameters(model, train_fc=False):
             p.requires_grad = False
 
 
+from sklearn.neighbors import NearestNeighbors
+def sklearn_knn(test_np, train_np, n_neighbors=2):
+    knn = NearestNeighbors(n_neighbors)
+    knn.fit(train_np)
+    D, I = knn.kneighbors(test_np)
+    return np.sum(D, axis=1)
+
+
 # https://gist.github.com/JosueCom/7e89afc7f30761022d7747a501260fe3
 # def knn_score(train_set, test_set, n_neighbours=2):
 #     """
