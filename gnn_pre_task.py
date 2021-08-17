@@ -56,7 +56,6 @@ def get_model_architecture(model, g, dataset):
         return models.GCN(g.ndata['feat'].shape[1], 16, dataset.num_classes)  # .to('cuda')
 
 
-# g = g.to('cuda')
 def get_node_class_model(args):
     # Create the model with given dimensions
     g, dataset = panda_utils.get_graph('cora')
@@ -77,4 +76,14 @@ def get_model(args):
         print('Default model is node classification with gcn')
         return get_node_class_model(args)
 
-
+# run separatly
+# class Arguments:
+#     dataset = 'cora'
+#     epocs = 100
+#     lr = 0.001
+#     model = 'gcn'
+#     task = 'node_class'
+#     layers = 1
+#     h_dim1 = 16
+# args = Arguments()
+# model = get_model(args)

@@ -53,13 +53,17 @@ def get_score(model, device, graph, num_classes):
     train_mask = graph.ndata['train_mask']
     test_mask = graph.ndata['test_mask']
     with torch.no_grad():
-        features = model(graph)
+        f = graph.ndata['feat']
+        features = model(graph, f)
         train_feature_space = features[train_mask]
         test_feature_space = features[test_mask]
         # todo train_feature_space = torch.cat(train_feature_space, dim=0).contiguous().cpu().numpy()
-    test_labels = graph.ndata[test_mask]
+    test_labels = graph.ndata['label'][test_mask]
 
-    distances = panda_utils.knn_score(train_feature_space, test_feature_space, num_classes)
+    distances = panda_utils.knn_score(train_feature_space,
+                                      test_feature_space,
+                                      num_classes
+                                      )
 
     # todo - how to calculate the ROC for unknown anomalies?
 

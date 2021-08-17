@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-import faiss
+#import faiss
 import dgl.data
 
 mvtype = ['bottle', 'cable', 'capsule', 'carpet', 'grid', 'hazelnut', 'leather',
@@ -28,19 +28,19 @@ def freeze_parameters(model, train_fc=False):
         for p in model.fc.parameters():
             p.requires_grad = False
 
+
 # https://gist.github.com/JosueCom/7e89afc7f30761022d7747a501260fe3
-def knn_score(train_set, test_set, n_neighbours=2):
-    """
-    Calculates the KNN distance
-    """
-    index = faiss.IndexFlatL2(train_set.shape[1])
-    index.add(train_set)
-    D, _ = index.search(test_set, n_neighbours)
-    return np.sum(D, axis=1)
+# def knn_score(train_set, test_set, n_neighbours=2):
+#     """
+#     Calculates the KNN distance
+#     """
+#     index = faiss.IndexFlatL2(train_set.shape[1])
+#     index.add(train_set)
+#     D, _ = index.search(test_set, n_neighbours)
+#     return np.sum(D, axis=1)
 
 
 def get_graph(dataset_name):
-    dataset, g = None, None
     if dataset_name =='cora':
         dataset = dgl.data.CoraGraphDataset()
         # cora db has one graph
