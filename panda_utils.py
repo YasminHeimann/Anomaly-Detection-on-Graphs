@@ -30,6 +30,8 @@ def freeze_parameters(model, train_fc=False):
 
 
 from sklearn.neighbors import NearestNeighbors
+
+
 def sklearn_knn(test_np, train_np, n_neighbors=2):
     knn = NearestNeighbors(n_neighbors)
     knn.fit(train_np)
@@ -38,14 +40,14 @@ def sklearn_knn(test_np, train_np, n_neighbors=2):
 
 
 # https://gist.github.com/JosueCom/7e89afc7f30761022d7747a501260fe3
-# def knn_score(train_set, test_set, n_neighbours=2):
-#     """
-#     Calculates the KNN distance
-#     """
-#     index = faiss.IndexFlatL2(train_set.shape[1])
-#     index.add(train_set)
-#     D, _ = index.search(test_set, n_neighbours)
-#     return np.sum(D, axis=1)
+def knn_score(train_set, test_set, n_neighbours=2):
+    """
+    Calculates the KNN distance
+    """
+    index = faiss.IndexFlatL2(train_set.shape[1])
+    index.add(train_set)
+    D, _ = index.search(test_set, n_neighbours)
+    return np.sum(D, axis=1)
 
 
 def get_graph(dataset_name):

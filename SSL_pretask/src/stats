@@ -1,0 +1,46 @@
+Results:
+Full supervised task:
+| == Method == || == DB == | == Accuracy == | == Model == | == Layers == | == Task == |
+    Supervised      cora        0.858           GCN             3
+    Supervised      citeseer    0.753           GCN             3
+    Supervised      pubmed      0.873           GCN             3
+    SSL             cora        0.857           GCN             3        Pairwise Distance
+    SSL             citeseer    0.771           GCN             3        Pairwise Distance
+    SSL             pubmed      0.879           GCN             3        Pairwise Distance
+
+
+----
+Log: Supervised
+----
+--------DB:  cora --------
+Load full supervised task.
+nclass: 7	nfea:1433
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.4928 auc= 0.9750 accuracy= 0.8580
+accuracy=0.85800
+0.142893	0.000000	0.492759	0.954470	0.000000	0.858000
+Self-Supervised Type: Base
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='cora', debug=False, dropout=0.5, early_stopping=0, epochs=800, fastmode=False, hidden=128, inputlayer='gcn', lambda_=0, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='Base', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.4460856720827179
+--------DB:  citeseer --------
+Load full supervised task.
+C:\Users\Yasmin\PycharmProjects\Graph_Anomaly\SelfTask-GNN\src\normalization.py:116: RuntimeWarning: divide by zero encountered in power
+  r_inv = np.power(rowsum, -1).flatten()
+nclass: 6	nfea:3703
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.9013 auc= 0.9176 accuracy= 0.7530
+accuracy=0.75300
+0.248620	0.000000	0.901271	0.908940	0.000000	0.753000
+Self-Supervised Type: Base
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='citeseer', debug=False, dropout=0.5, early_stopping=0, epochs=800, fastmode=False, hidden=128, inputlayer='gcn', lambda_=0, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='Base', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.5446348061316502
+--------DB:  pubmed --------
+Load full supervised task.
+nclass: 3	nfea:500
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.3274 auc= 0.9691 accuracy= 0.8730
+accuracy=0.87300
+0.322299	0.000000	0.327439	0.881539	0.000000	0.873000
+Self-Supervised Type: Base
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=800, fastmode=False, hidden=128, inputlayer='gcn', lambda_=0, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='Base', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538

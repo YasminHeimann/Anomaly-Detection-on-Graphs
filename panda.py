@@ -21,7 +21,7 @@ def train_model(model, graph, device, args, ewc_loss, num_classes):
     train_mask = graph.ndata['train_mask']
 
     for epoch in range(args.epochs):
-        model.train()
+        model.train_epoch()
         running_loss = run_epoch(model, graph, train_mask, optimizer, criterion, device, args.ewc, ewc_loss)
         print('Epoch: {}, Loss: {}'.format(epoch + 1, running_loss))
         model.eval()
