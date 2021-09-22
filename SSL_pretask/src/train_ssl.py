@@ -3,22 +3,18 @@ from __future__ import print_function
 
 import time
 import argparse
-import numpy as np
 
-import torch
-import torch.nn.functional as F
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 
 from metric import accuracy, roc_auc_compute_fn
-from utils import load_citation, load_reddit_data
 
 from earlystopping import EarlyStopping
 from sample import Sampler
-import utils
 import shutil
 import os.path as osp
 from models import *
+from selfsl import *
 
 
 def get_arguments():
@@ -204,7 +200,6 @@ def get_lr(optimizer):
         return param_group['lr']
 
 
-# define the training function.
 def train_epoch(args, model, sampler, labels, early_stopping, scheduler, optimizer, ssl_agent,
                 epoch, train_adj, train_fea, idx_train, idx_val, val_adj=None, val_fea=None):
     if val_adj is None:
@@ -294,8 +289,6 @@ def test(args, model, test_adj, test_fea, labels, idx_test):
     return (loss_test.item(), acc_test.item())
 
 
-#####################################
-from selfsl import *
 def get_agent_by_task(args, sampler, labels, model, idx_train, optimizer):
     ssl_agent = None
     nclass = max(labels).item() + 1
@@ -371,7 +364,7 @@ def get_agent_by_task(args, sampler, labels, model, idx_train, optimizer):
     return ssl_agent, optimizer
 
 
-def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, scheduler, early_stopping, idx_val):
+def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, scheduler, early_stopping, idx_val, tb_writer):
     # Train model
     t_total = time.time()
     loss_train = np.zeros((args.epochs,))
@@ -466,23 +459,24 @@ def test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, los
 
 def main():
     args = get_arguments()
-    dbs = ['cora', 'citeseer', 'pubmed']
-    for db in dbs:
-        print("--------DB:", db, "--------")
-        args.dataset = db
-        pre_setting(args)
-        sampler = set_sampler(args)
-        model, optimizer, scheduler, labels, idx_train, idx_val, idx_test = set_model(args, sampler)
-        # todo: check early stopping from set model?
-        early_stopping, tb_writer = set_early_stopping(args)
+    # dbs = ['cora', 'citeseer', 'pubmed']
+    # for db in dbs:
+    #     print("--------DB:", db, "--------")
+    #     args.dataset = db
+    pre_setting(args)
+    sampler = set_sampler(args)
+    model, optimizer, scheduler, labels, idx_train, idx_val, idx_test = set_model(args, sampler)
+    # todo: check early stopping from set model?
+    early_stopping, tb_writer = set_early_stopping(args)
 
-        ssl_agent, optimizer = get_agent_by_task(args, sampler, labels, model, idx_train, optimizer)
-        loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, idx_train, ssl_agent, model,
-                                                                                        optimizer, sampler, labels, scheduler,
-                                                                                        early_stopping, idx_val)
-        test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val)
+    ssl_agent, optimizer = get_agent_by_task(args, sampler, labels, model, idx_train, optimizer)
+    loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, idx_train, ssl_agent, model,
+                                                                optimizer, sampler, labels, scheduler,
+                                                                early_stopping, idx_val)
+    test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val)
+    return
 
 
-if __name__ == '__main__':
-    main()
+def get_pre_trained_model():
+    pass
 

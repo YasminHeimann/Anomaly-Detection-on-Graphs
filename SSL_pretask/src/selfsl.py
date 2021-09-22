@@ -207,8 +207,8 @@ class NodeProperty(Base):
         # print(acc)
         return loss
 
-class PairwiseDistance(Base):
 
+class PairwiseDistance(Base):
     def __init__(self, adj, features, nhid, device, idx_train, regression=False):
         self.adj = adj
         self.features = features.to(device)

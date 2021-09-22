@@ -1,9 +1,9 @@
+import argparse
 import torch
 import torch.nn.functional as F
 
 import models
-import panda_utils
-import numpy as np
+import dgl_utils
 
 
 def train(g, model, args):  # epocs=100, lr=0.01
@@ -17,7 +17,7 @@ def train(g, model, args):  # epocs=100, lr=0.01
     val_mask = g.ndata['val_mask']
     test_mask = g.ndata['test_mask']
 
-    # train set labels: takes onle samples with label 0
+    # train set labels: takes only samples with label 0
     # train set data: takes only the TARGET labels. True iff i == label.
     # test set labels: takes 1 if not label, 0 o.w.
     # test set data: FULL
@@ -72,13 +72,12 @@ def get_model_architecture(model, g, dataset):
 
 def get_node_class_model(args):
     # Create the model with given dimensions
-    g, dataset = panda_utils.get_graph('cora')
+    g, dataset = dgl_utils.get_dgl_graph(args.dataset)
     print("features dim: ", g.ndata['feat'].shape[1])
 
     model = get_model_architecture(args.model, g, dataset)
     train(g, model, args)
 
-    print("hello gur")
     print("\nfinished training GCN\n")
     return model, g, dataset
 
@@ -91,65 +90,26 @@ def get_model(args):
         return get_node_class_model(args)
 
 
-def get_data_one2many(g, label):
-    train_mask = g.ndata['train_mask']
-    test_mask = g.ndata['test_mask']
-    full_labels = g.ndata['label']
-    train_labels = full_labels[train_mask]
-    test_labels = full_labels[test_mask]
-    # full_labels = (test_labels.cpu().detach().numpy() > 0).astype(int)
-    # 0 - 1, 0 - 1,2,...9
+def parse_args():
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('--dataset', default='cora')
 
-    test_labels_final = (test_labels.cpu().detach().numpy() != label).astype(int)
-    train_labels_final = (train_labels.cpu().detach().numpy() == label).astype(int)
+    # parser.add_argument('--diag_path', default='./data/fisher_diagonal.pth', help='fim diagonal path')
+    # parser.add_argument('--ewc', default=False, action='store_true', help='Train with EWC')
+    parser.add_argument('--epochs', default=30, type=int, metavar='epochs', help='number of epochs')
+    #parser.add_argument('--label', default=0, type=int, help='The normal class')
+    parser.add_argument('--lr', type=float, default=1e-2, help='The initial learning rate.')
 
-    labels_np = full_labels.cpu().detach().numpy()
-    train_mask_final = [(labels_np[i] == label) and m.item() for i,m in enumerate(train_mask)]
-
-
-    #full_train_labels_mask = full_labels.cpu().detach().numpy() and train_mask
-    #train_mask_final = np.array([l != label for l in full_train_labels_mask])
-
-    return torch.tensor(train_mask_final), train_labels_final, test_mask, test_labels_final
-
-class GraphData():
-
-    def __init__(self, g, args, method='one2many'):
-        self.graph = g
-        # can choose the method of processing data
-        self.train_mask, self.train_labels, self.test_mask, self.test_labels \
-            = get_data_one2many(self.graph, args.label)
-    @property
-    def get_train_mask(self):
-        return self.train_mask
-
-    @property
-    def get_train_labels(self):
-        return self.train_labels
-
-    @property
-    def get_test_mask(self):
-        return self.test_mask
-
-    @property
-    def get_test_labels(self):
-        return self.test_labels
+    parser.add_argument('--model', default='gcn', type=str, help='which architecture to use')
+    parser.add_argument('--task', default='node_class', type=str, help='which architecture to use')
+    parser.add_argument('--layers', default=1, type=int, help='which architecture to use')
+    return parser.parse_args()
 
 
-##run separatly
-class Arguments:
-    dataset = 'cora'
-    epocs = 5
-    lr = 0.001
-    model = 'gcn'
-    task = 'node_class'
-    layers = 1
-    h_dim1 = 16
-    label = 0
-
-
-args = Arguments()
-model, g, dataset = get_model(args)
-data = GraphData(g, args)
-print(1)
+def get_pre_trained_model():
+    args = parse_args()
+    print('Dataset: {}, Model Architecture: {}, LR: {}'.format(args.dataset, args.net, args.lr))
+    model, g, dataset = get_model(args)
+    data = dgl_utils.GraphData(g, args)
+    return dgl_utils.PretrainedModel(model, data, args.task)
 

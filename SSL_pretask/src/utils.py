@@ -10,6 +10,7 @@ from normalization import fetch_normalization, row_normalize
 
 datadir = "data"
 
+
 def parse_index_file(filename):
     """Parse index file."""
     index = []
@@ -17,11 +18,13 @@ def parse_index_file(filename):
         index.append(int(line.strip()))
     return index
 
+
 def preprocess_citation(adj, features, normalization="FirstOrderGCN"):
     adj_normalizer = fetch_normalization(normalization)
     adj = adj_normalizer(adj)
     features = row_normalize(features)
     return adj, features
+
 
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
@@ -36,6 +39,7 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
 def save_sparse_csr(filename,array):
     np.savez(filename,data = array.data ,indices=array.indices,
              indptr =array.indptr, shape=array.shape )
+
 
 def load_sparse_csr(filename):
     loader = np.load(filename)
@@ -125,6 +129,7 @@ def load_nell(dataset="nell.0.001", normalization="AugNormAdj", porting_to_torch
     learning_type = "transductive"
     return adj, features, labels, idx_train, idx_val, idx_test, degree, learning_type
 
+
 def load_citation(dataset_str="cora", normalization="AugNormAdj", porting_to_torch=True,data_path=datadir, task_type="full"):
     """
     Load Citation Networks Datasets.
@@ -198,12 +203,14 @@ def load_citation(dataset_str="cora", normalization="AugNormAdj", porting_to_tor
     learning_type = "transductive"
     return adj, features, labels, idx_train, idx_val, idx_test, degree, learning_type
 
+
 def sgc_precompute(features, adj, degree):
     #t = perf_counter()
     for i in range(degree):
         features = torch.spmm(adj, features)
     precompute_time = 0 #perf_counter()-t
     return features, precompute_time
+
 
 def set_seed(seed, cuda):
     np.random.seed(seed)
@@ -216,6 +223,7 @@ def loadRedditFromNPZ(dataset_dir=datadir):
     data = np.load(dataset_dir +"reddit.npz")
 
     return adj, data['feats'], data['y_train'], data['y_val'], data['y_test'], data['train_index'], data['val_index'], data['test_index']
+
 
 def load_reddit_transductive(normalization="AugNormAdj", porting_to_torch=True, data_path=datadir):
     adj, features, y_train, y_val, y_test, train_index, val_index, test_index = loadRedditFromNPZ(data_path)
@@ -285,9 +293,7 @@ def load_reddit_data(normalization="AugNormAdj", porting_to_torch=True, data_pat
     return adj, train_adj, features, train_features, labels, train_index, val_index, test_index, degree, learning_type
 
 
-
-
-def data_loader(dataset, data_path=datadir, normalization="AugNormAdj", porting_to_torch=True, task_type = "full"):
+def data_loader(dataset, data_path=datadir, normalization="AugNormAdj", porting_to_torch=True, task_type="full"):
     if dataset == "reddit":
         # return load_reddit_data(normalization, porting_to_torch, data_path)
         return load_reddit_transductive(normalization, porting_to_torch, data_path)
@@ -303,7 +309,6 @@ def data_loader(dataset, data_path=datadir, normalization="AugNormAdj", porting_
         train_adj = adj
         train_features = features
         return adj, train_adj, features, train_features, labels, idx_train, idx_val, idx_test, degree, learning_type
-
 
 
 def get_pairwise_sim(x):

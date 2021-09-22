@@ -1,42 +1,8 @@
-import torch
 import numpy as np
-#import faiss
-import dgl.data
-
-mvtype = ['bottle', 'cable', 'capsule', 'carpet', 'grid', 'hazelnut', 'leather',
-          'metal_nut', 'pill', 'screw', 'tile', 'toothbrush', 'transistor',
-          'wood', 'zipper']
-
-
-def freeze_model(model):
-    for param in model.parameters():
-        param.requires_grad = False
-    return
-
-
-# TODO what to change?
-def freeze_parameters(model, train_fc=False):
-    for p in model.conv1.parameters():
-        p.requires_grad = False
-    for p in model.bn1.parameters():
-        p.requires_grad = False
-    for p in model.layer1.parameters():
-        p.requires_grad = False
-    for p in model.layer2.parameters():
-        p.requires_grad = False
-    if not train_fc:
-        for p in model.fc.parameters():
-            p.requires_grad = False
-
-
 from sklearn.neighbors import NearestNeighbors
 
-
-def sklearn_knn(test_np, train_np, n_neighbors=2):
-    knn = NearestNeighbors(n_neighbors)
-    knn.fit(train_np)
-    D, I = knn.kneighbors(test_np)
-    return np.sum(D, axis=1)
+import Dgl_pretask.train_dgl as dgl_task
+import SSL_pretask.src.train_ssl as ssl_task
 
 
 # https://gist.github.com/JosueCom/7e89afc7f30761022d7747a501260fe3
@@ -44,32 +10,10 @@ def knn_score(train_set, test_set, n_neighbours=2):
     """
     Calculates the KNN distance
     """
-    index = faiss.IndexFlatL2(train_set.shape[1])
-    index.add(train_set)
-    D, _ = index.search(test_set, n_neighbours)
+    knn = NearestNeighbors(n_neighbours)
+    knn.fit(train_set)
+    D, I = knn.kneighbors(test_set)
     return np.sum(D, axis=1)
-
-
-def get_graph(dataset_name):
-    if dataset_name =='cora':
-        dataset = dgl.data.CoraGraphDataset()
-        # cora db has one graph
-        g = dataset[0]
-    elif dataset_name == 'citeseer':
-        dataset = dgl.data.CiteseerGraphDataset()
-        # citeseer db has one graph todo ?
-        g = dataset[0]
-    else:
-        print('Default Dataset is cora')
-        dataset = dgl.data.CoraGraphDataset()
-        # cora db has one graph
-        g = dataset[0]
-    print('\nNumber of categories:', dataset.num_classes)
-    print('Node features')
-    print(g.ndata)
-    print('Edge features')
-    print(g.edata)
-    return g, dataset
 
 
 def clip_gradient(optimizer, grad_clip):
@@ -80,3 +24,11 @@ def clip_gradient(optimizer, grad_clip):
             if param.grad is None:
                 continue
             param.grad.data.clamp_(-grad_clip, grad_clip)
+
+
+def get_pretrained_model(pre_task):
+    if pre_task == 'dgl':
+        return dgl_task.get_pre_trained_model()
+    if pre_task == 'ssl':
+        return ssl_task.get_pre_trained_model()
+

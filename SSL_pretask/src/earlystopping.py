@@ -7,7 +7,7 @@ import datetime
 import os
 
 # TODO: hard coding the model path here.
-folder = "C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\sample_outs"
+folder = "C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SSL_pretask\\src\\sample_outs"
 if not os.path.exists(folder):
     os.mkdir(folder)
 
