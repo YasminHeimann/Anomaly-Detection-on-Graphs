@@ -5,10 +5,12 @@ import os
 import subprocess
 import scipy.sparse as sp
 
+
 def encode_onehot(labels):
     eye = np.eye(labels.max() + 1)
     onehot_mx = eye[labels]
     return onehot_mx
+
 
 def normalize_vector(v):
     # mean_ = torch.mean(v)
@@ -16,6 +18,7 @@ def normalize_vector(v):
     # return (v - mean_) / std
     # return (v-v.min())/(v.max()-v.min())
     return v
+
 
 def calc_pagerank(G, device, multi_class):
     pagerank = nx.pagerank(G, alpha=0.85)
@@ -28,6 +31,7 @@ def calc_pagerank(G, device, multi_class):
         pseudo_labels = torch.Tensor([p for p in pagerank.values()]).to(device)
         pseudo_labels = normalize_vector(pseudo_labels)
         return pseudo_labels
+
 
 def calc_degree(G, device, multi_class):
     degrees = dict(G.degree())
@@ -45,6 +49,7 @@ def calc_degree(G, device, multi_class):
 def calc_node_importance(G):
     pass
 
+
 def calc_centrality(G, device, multi_class):
     centrality = nx.closeness_centrality(G)
     if multi_class:
@@ -55,8 +60,10 @@ def calc_centrality(G, device, multi_class):
         pseudo_labels = torch.Tensor([p for p in centrality.values()]).to(device)
         return pseudo_labels
 
+
 def calc_clustering_coeff(G):
     pass
+
 
 def split_multiclass(pseudo_labels, sorted_values):
     n = len(sorted_values)
@@ -77,6 +84,7 @@ def split_multiclass(pseudo_labels, sorted_values):
 
     return pseudo_labels
 
+
 def bfs(adj, node, visited):
     pass
 
@@ -88,6 +96,8 @@ def label_statics(labels):
     return counter
 
 import pandas as pd
+
+
 def feature_statics(features):
     df = pd.DataFrame(features)
     import ipdb
@@ -184,10 +194,12 @@ def selftraining(adj, labels, idx_train, args):
     return torch.LongTensor(y_train.argmax(1)),\
            np.arange(adj.shape[0])[train_mask]
 
+
 def get_mask(idx, labels):
     mask = np.zeros(labels.shape[0], dtype=np.bool)
     mask[idx] = 1
     return mask
+
 
 def get_y(idx, labels):
     mx = np.zeros(labels.shape)
@@ -202,6 +214,8 @@ class SMP:
 
 
 from sklearn.metrics.pairwise import cosine_similarity
+
+
 def label_correction(embeddings, labels, idx_sampled, idx_train=None, is_numpy=False):
     get_sim = cosine_similarity
     embeddings = embeddings.cpu().numpy()
@@ -267,6 +281,7 @@ def to_scipy(tensor):
         values = tensor[indices[0], indices[1]]
         return sp.csr_matrix((values.cpu().numpy(), indices.cpu().numpy()), shape=tensor.shape)
 
+
 def is_sparse_tensor(tensor):
     # if hasattr(tensor, 'nnz'):
     if tensor.layout == torch.sparse_coo:
@@ -298,6 +313,7 @@ def get_few_labeled_splits(labels, train_size, seed=None):
     idx_test = idx_unlabeled[500: 1500]
     return idx_train, idx_val, idx_test
 
+
 def get_splits_each_class(labels, train_size, seed=None):
     '''
         This setting follows gcn, where we randomly sample n instances for class,
@@ -320,5 +336,87 @@ def get_splits_each_class(labels, train_size, seed=None):
 
     return np.random.permutation(idx_train), np.random.permutation(idx_val), \
            np.random.permutation(idx_test)
+
+
+class GraphData:
+    def __init__(self, sampler, dataset, args, method='one2many'):
+        self._dataset = dataset
+        self._sampler = sampler
+        # can choose the method of processing data
+        self.train_mask, self.train_labels, self.test_mask, self.test_labels \
+            = get_data_one2many(self._graph, args.label)
+
+    @property
+    def get_train_mask(self):
+        return self.train_mask
+
+    @property
+    def get_train_labels(self):
+        return self.train_labels
+
+    @property
+    def get_test_mask(self):
+        return self.test_mask
+
+    @property
+    def get_test_labels(self):
+        return self.test_labels
+
+    @property
+    def graph(self):  # todo - how to generalize?
+        return self._graph
+
+    @property
+    def num_classes(self):
+        return self._dataset.num_classes
+
+
+from torch import nn
+
+
+class PretrainedModel:
+    def __init__(self, model: nn.Module, data: GraphData, pre_task):
+        self.ssl_model = model
+        self._data = data
+        self.graph = data.graph
+        self.pre_task = pre_task
+
+    def predict_logits(self):
+        return self.ssl_model(self.graph)
+
+    def loss(self, criterion, features, mode):
+        if mode == 'train':
+            mask = self._data.train_mask
+        else:
+            mask = self._data.test_mask
+        return criterion(features[mask])
+
+    def feature_space(self, mode):
+        features = self.ssl_model(self.graph)
+        if mode == 'train':
+            return features[self._data.train_mask]
+        elif mode == 'test':
+            return features[self._data.test_mask]
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def model(self):
+        return self.ssl_model
+
+    def parameters(self):
+        return self.ssl_model.parameters()
+
+    def train(self):
+        self.ssl_model.train()
+
+    def eval(self):
+        self.ssl_model.eval()
+
+    def to(self, device):
+        self.ssl_model.to(device)
+
 
 

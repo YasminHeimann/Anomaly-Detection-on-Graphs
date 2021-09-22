@@ -95,17 +95,14 @@ class PretrainedModel:
             #mask = self.graph.ndata['train_mask']
             mask = self._data.train_mask
         else:
-            #mask = self.graph.ndata['test_mask']
             mask = self._data.test_mask
         return criterion(features[mask])
 
     def feature_space(self, mode):
         features = self.dgl_model(self.graph)
         if mode == 'train':
-            #train_mask = self.graph.ndata['train_mask']
             return features[self._data.train_mask]
         elif mode == 'test':
-            #test_mask = self.graph.ndata['test_mask']
             return features[self._data.test_mask]
 
     @property

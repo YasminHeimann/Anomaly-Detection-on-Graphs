@@ -57,7 +57,7 @@ def train(g, model, args):  # epocs=100, lr=0.01
         loss.backward()
         optimizer.step()
 
-        if e % 5 == 0:
+        if e % 1 == 0:
             print('In epoch {}, loss: {:.3f}, val acc: {:.3f} (best {:.3f}), test acc: {:.3f} (best {:.3f})'.format(
                 e, loss, val_acc, best_val_acc, test_acc, best_test_acc))
 
@@ -96,7 +96,7 @@ def parse_args():
 
     # parser.add_argument('--diag_path', default='./data/fisher_diagonal.pth', help='fim diagonal path')
     # parser.add_argument('--ewc', default=False, action='store_true', help='Train with EWC')
-    parser.add_argument('--epochs', default=30, type=int, metavar='epochs', help='number of epochs')
+    parser.add_argument('--epochs', default=100, type=int, metavar='epochs', help='number of epochs')
     parser.add_argument('--label', default=0, type=int, help='The normal class')
     parser.add_argument('--lr', type=float, default=1e-2, help='The initial learning rate.')
 

@@ -39,7 +39,7 @@ def train_panda_model(data, model, device, args, ewc_loss, num_classes):
         print('Epoch: {}, Loss: {}'.format(epoch + 1, running_loss))
         run_loss.append(running_loss)
         model.eval()
-        auc, feature_space = get_score(data, model, device, num_classes)
+        auc, feature_space = panda_utils.get_score(data, model, device, num_classes)
         print('Epoch: {}, AUROC is: {}'.format(epoch + 1, auc))
         auroc.append(auc)
     return run_loss, auroc
@@ -52,7 +52,6 @@ def main(args):
     model.to(device)  # todo, should it be model = model.to(device)
 
     ewc_loss = None
-
     # Freezing Pre-trained model for EWC todo
     # if args.ewc:
     #     frozen_model = deepcopy(model).to(device)
