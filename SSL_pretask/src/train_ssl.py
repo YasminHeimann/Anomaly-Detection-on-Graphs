@@ -4,6 +4,7 @@ from __future__ import print_function
 import time
 import argparse
 
+import dgl
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 
@@ -51,7 +52,8 @@ def get_arguments():
     # TODO change sata path
     parser.add_argument('--datapath', default="data/", help="The data path.")
     parser.add_argument("--early_stopping", type=int,
-                        default=0, help="The patience of earlystopping. Do not adopt the earlystopping when it equals 0.")
+                        default=0,
+                        help="The patience of earlystopping. Do not adopt the earlystopping when it equals 0.")
     parser.add_argument("--no_tensorboard", default=True, help="Disable writing logs to tensorboard")
 
     # Model parameter
@@ -81,7 +83,8 @@ def get_arguments():
                         help="The number of layers in each baseblock")
     parser.add_argument("--aggrmethod", default="default",
                         help="The aggrmethod for the layer aggreation. The options includes add and concat. Only valid in resgcn, densegcn and inecptiongcn")
-    parser.add_argument("--task_type", default="full", help="The node classification task type (full and semi). Only valid for cora, citeseer and pubmed dataset.")
+    parser.add_argument("--task_type", default="full",
+                        help="The node classification task type (full and semi). Only valid for cora, citeseer and pubmed dataset.")
 
     args = parser.parse_args()
 
@@ -275,11 +278,9 @@ def test(args, model, test_adj, test_fea, labels, idx_test):
     if args.pca:
         args.ssl += '~PCA'
 
-
     if args.write_res:
         probs = torch.exp(output)
         np.save(f'preds/{args.dataset}_{args.seed}_pred.npy', probs.detach().cpu().numpy())
-
 
     print("Test set results:",
           "loss= {:.4f}".format(loss_test.item()),
@@ -312,7 +313,8 @@ def get_agent_by_task(args, sampler, labels, model, idx_train, optimizer):
     #     ssl_agent = EdgeMelt(sampler.adj, sampler.features, device='cuda')
 
     if args.ssl == 'DistanceCluster':
-        ssl_agent = DistanceCluster(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden, device=device, args=args)
+        ssl_agent = DistanceCluster(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden, device=device,
+                                    args=args)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
@@ -323,32 +325,38 @@ def get_agent_by_task(args, sampler, labels, model, idx_train, optimizer):
     #                            lr=args.lr, weight_decay=args.weight_decay)
 
     if args.ssl == 'PairwiseDistance':
-        ssl_agent = PairwiseDistance(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden, device=device)
+        ssl_agent = PairwiseDistance(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden,
+                                     device=device)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
     if args.ssl == 'PairwiseAttrSim':
-        ssl_agent = PairwiseAttrSim(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden, args=args, device=device)
+        ssl_agent = PairwiseAttrSim(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden, args=args,
+                                    device=device)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
     if args.ssl == 'Distance2Labeled':
-        ssl_agent = Distance2Labeled(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train, nhid=args.hidden, device=device)
+        ssl_agent = Distance2Labeled(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train,
+                                     nhid=args.hidden, device=device)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
     if args.ssl == 'ICAContextLabel':
-        ssl_agent = ICAContextLabel(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train, nhid=args.hidden, device=device, args=args)
+        ssl_agent = ICAContextLabel(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train,
+                                    nhid=args.hidden, device=device, args=args)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
     if args.ssl == 'LPContextLabel':
-        ssl_agent = LPContextLabel(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train, nhid=args.hidden, device=device, args=args)
+        ssl_agent = LPContextLabel(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train,
+                                   nhid=args.hidden, device=device, args=args)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
     if args.ssl == 'CombinedContextLabel':
-        ssl_agent = CombinedContextLabel(sampler.adj, sampler.features, sampler.labels, nclass=nclass, idx_train=idx_train, nhid=args.hidden, device=device, args=args)
+        ssl_agent = CombinedContextLabel(sampler.adj, sampler.features, sampler.labels, nclass=nclass,
+                                         idx_train=idx_train, nhid=args.hidden, device=device, args=args)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
 
@@ -374,6 +382,8 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
     loss_ssl = np.zeros((args.epochs,))
 
     sampling_t = 0
+    dataset = dgl.data.CoraGraphDataset()
+    graph = dataset[0]
     for epoch in range(args.epochs):
         if args.alpha != 0:
             ssl_agent.label_correction = True
@@ -382,7 +392,14 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
         sampling_t = time.time()
         # no sampling
         # randomedge sampling if args.sampling_percent >= 1.0, it behaves the same as stub_sampler.
+
+
+        train_adj_2 = graph.adj()
+        train_fea_2 = graph.ndata['feat']
+
         train_adj, train_fea = ssl_agent.transform_data()
+        train_adj, train_fea = train_adj_2,train_fea_2
+
         # (train_adj, train_fea) = sampler.randomedge_sampler(percent=args.sampling_percent, normalization=args.normalization, cuda=args.cuda)
         if args.mixmode:
             train_adj = train_adj.cuda()
@@ -414,7 +431,9 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
                   't_time: {:.4f}s'.format(outputs[6]))
 
         if args.no_tensorboard is False:
-            tb_writer.add_scalars('Loss', {'class': outputs[0], 'ssl': outputs[4] , 'total': outputs[5], 'val': outputs[2]}, epoch)
+            tb_writer.add_scalars('Loss',
+                                  {'class': outputs[0], 'ssl': outputs[4], 'total': outputs[5], 'val': outputs[2]},
+                                  epoch)
             tb_writer.add_scalars('Accuracy', {'train': outputs[1], 'val': outputs[3]}, epoch)
 
         if args.early_stopping > 0 and early_stopping.early_stop:
@@ -422,13 +441,17 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
             model.load_state_dict(early_stopping.load_checkpoint())
             break
 
-        loss_train[epoch], acc_train[epoch], loss_val[epoch], acc_val[epoch], loss_ssl[epoch] = outputs[0], outputs[1], outputs[2], outputs[3], outputs[4]
+        loss_train[epoch], acc_train[epoch], loss_val[epoch], acc_val[epoch], loss_ssl[epoch] = outputs[0], outputs[1], \
+                                                                                                outputs[2], outputs[3], \
+                                                                                                outputs[4]
 
     if args.early_stopping > 0:
         model.load_state_dict(early_stopping.load_checkpoint())
         # print('=== best score: %s, epoch %s ===' % (early_stopping.best_score, early_stopping.best_epoch))
-        print('=== best score: %s, loss_val: %s, epoch %s ===' % (early_stopping.best_score, loss_val[early_stopping.best_epoch], early_stopping.best_epoch))
-        print('For this epoch, val loss: %s, val acc: %s' % (loss_val[early_stopping.best_epoch], acc_val[early_stopping.best_epoch]))
+        print('=== best score: %s, loss_val: %s, epoch %s ===' % (
+            early_stopping.best_score, loss_val[early_stopping.best_epoch], early_stopping.best_epoch))
+        print('For this epoch, val loss: %s, val acc: %s' % (
+            loss_val[early_stopping.best_epoch], acc_val[early_stopping.best_epoch]))
 
     if args.debug:
         print("Optimization Finished!")
@@ -446,12 +469,12 @@ def test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, los
     # todo here #################################################
     (loss_test, acc_test) = test(args, model, test_adj, test_fea, labels, idx_test)
     print("%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f" % (
-    loss_train[-1], loss_val[-1], loss_test, acc_train[-1], acc_val[-1], acc_test))
+        loss_train[-1], loss_val[-1], loss_test, acc_train[-1], acc_val[-1], acc_test))
     print('Self-Supervised Type: %s' % args.ssl)
 
     print(args)
     nnodes = sampler.adj.shape[0]
-    print('len(idx_train)/len(adj.shape[0])= ',len(idx_train)/nnodes)
+    print('len(idx_train)/len(adj.shape[0])= ', len(idx_train) / nnodes)
 
     if not args.no_tensorboard:
         tb_writer.close()
@@ -471,8 +494,8 @@ def main():
 
     ssl_agent, optimizer = get_agent_by_task(args, sampler, labels, model, idx_train, optimizer)
     loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, idx_train, ssl_agent, model,
-                                                                optimizer, sampler, labels, scheduler,
-                                                                early_stopping, idx_val, tb_writer)
+                                                               optimizer, sampler, labels, scheduler,
+                                                               early_stopping, idx_val, tb_writer)
     test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val)
     return
 
@@ -480,4 +503,7 @@ def main():
 def get_pre_trained_model():
     pass
 
+
+if __name__ == '__main__':
+    main()
 main()
