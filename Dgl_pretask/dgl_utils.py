@@ -48,7 +48,8 @@ def get_data_one2many(g, label):
 
 
 class GraphData:
-    def __init__(self, g, args, method='one2many'):
+    def __init__(self, g, dataset, args, method='one2many'):
+        self._dataset = dataset
         self._graph = g
         # can choose the method of processing data
         self.train_mask, self.train_labels, self.test_mask, self.test_labels \
@@ -74,9 +75,9 @@ class GraphData:
     def graph(self):  # todo - how to generalize?
         return self._graph
 
-    # @graph.setter
-    # def graph(self, value):
-    #     self._graph = value
+    @property
+    def num_classes(self):
+        return self._dataset.num_classes
 
 
 class PretrainedModel:
@@ -91,20 +92,21 @@ class PretrainedModel:
 
     def loss(self, criterion, features, mode):
         if mode == 'train':
-            mask = self.graph.ndata['train_mask']
+            #mask = self.graph.ndata['train_mask']
+            mask = self._data.train_mask
         else:
-            mask = self.graph.ndata['test_mask']
+            #mask = self.graph.ndata['test_mask']
+            mask = self._data.test_mask
         return criterion(features[mask])
 
     def feature_space(self, mode):
-        f = self.graph.ndata['feat']
-        features = self.dgl_model(self.graph, f)
+        features = self.dgl_model(self.graph)
         if mode == 'train':
-            train_mask = self.graph.ndata['train_mask']
-            return features[train_mask]
+            #train_mask = self.graph.ndata['train_mask']
+            return features[self._data.train_mask]
         elif mode == 'test':
-            test_mask = self.graph.ndata['test_mask']
-            return features[test_mask]
+            #test_mask = self.graph.ndata['test_mask']
+            return features[self._data.test_mask]
 
     @property
     def data(self):

@@ -472,7 +472,7 @@ def main():
     ssl_agent, optimizer = get_agent_by_task(args, sampler, labels, model, idx_train, optimizer)
     loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, idx_train, ssl_agent, model,
                                                                 optimizer, sampler, labels, scheduler,
-                                                                early_stopping, idx_val)
+                                                                early_stopping, idx_val, tb_writer)
     test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val)
     return
 
@@ -480,3 +480,4 @@ def main():
 def get_pre_trained_model():
     pass
 
+main()
