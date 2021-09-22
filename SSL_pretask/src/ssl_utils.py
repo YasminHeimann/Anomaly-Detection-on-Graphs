@@ -338,13 +338,31 @@ def get_splits_each_class(labels, train_size, seed=None):
            np.random.permutation(idx_test)
 
 
+def get_data_one2many(sampler, label, cuda):
+    full_labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(cuda)
+    # todo : check if idx is a true-false array?
+    train_labels = full_labels[idx_train]
+    test_labels = full_labels[idx_test]
+
+    # full_labels = (test_labels.cpu().detach().numpy() > 0).astype(int)
+    # 0 - 1, 0 - 1,2,...9
+
+    test_labels_final = (test_labels.cpu().detach().numpy() != label).astype(int)
+    train_labels_final = (train_labels.cpu().detach().numpy() == label).astype(int)
+
+    labels_np = full_labels.cpu().detach().numpy()
+    # mask the train to support only data with '0' label out of the train mask (e.g., normal)
+    train_mask_final = [(labels_np[i] == label) and m.item() for i, m in enumerate(idx_train)]
+
+    return train_mask_final, train_labels_final, idx_test, test_labels_final
+
+
 class GraphData:
-    def __init__(self, sampler, dataset, args, method='one2many'):
-        self._dataset = dataset
+    def __init__(self, sampler, label, cuda, method='one2many'):
         self._sampler = sampler
         # can choose the method of processing data
         self.train_mask, self.train_labels, self.test_mask, self.test_labels \
-            = get_data_one2many(self._graph, args.label)
+            = get_data_one2many(self._sampler, label, cuda)
 
     @property
     def get_train_mask(self):
@@ -359,32 +377,31 @@ class GraphData:
         return self.test_mask
 
     @property
-    def get_test_labels(self):
+    def get_test_labels(self):  # todo: used in the panda.py, other in the model
         return self.test_labels
 
     @property
-    def graph(self):  # todo - how to generalize?
-        return self._graph
-
-    @property
     def num_classes(self):
-        return self._dataset.num_classes
+        return self._sampler.nclass
 
 
 from torch import nn
 
 
 class PretrainedModel:
-    def __init__(self, model: nn.Module, data: GraphData, pre_task):
+    def __init__(self, model: nn.Module, data: GraphData, ssl_agent):
+        self._ssl_agent = ssl_agent
         self.ssl_model = model
         self._data = data
-        self.graph = data.graph
-        self.pre_task = pre_task
 
     def predict_logits(self):
-        return self.ssl_model(self.graph)
+        # todo take embedding before log_softmax? to call regular forward?
+        train_adj, train_feat = self._ssl_agent.transform_data()
+        output, embeddings = self.ssl_model.myforward(train_feat, train_adj, layer=-1)
+        return output
 
     def loss(self, criterion, features, mode):
+        # loss_train = F.nll_loss(features[idx_train], self._labels[idx_train])
         if mode == 'train':
             mask = self._data.train_mask
         else:
@@ -392,7 +409,7 @@ class PretrainedModel:
         return criterion(features[mask])
 
     def feature_space(self, mode):
-        features = self.ssl_model(self.graph)
+        features = self.predict_logits()
         if mode == 'train':
             return features[self._data.train_mask]
         elif mode == 'test':

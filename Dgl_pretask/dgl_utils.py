@@ -48,12 +48,12 @@ def get_data_one2many(g, label):
 
 
 class GraphData:
-    def __init__(self, g, dataset, args, method='one2many'):
+    def __init__(self, g, dataset, label, method='one2many'):
         self._dataset = dataset
         self._graph = g
         # can choose the method of processing data
         self.train_mask, self.train_labels, self.test_mask, self.test_labels \
-            = get_data_one2many(self._graph, args.label)
+            = get_data_one2many(self._graph, label)
 
     @property
     def get_train_mask(self):
@@ -81,18 +81,16 @@ class GraphData:
 
 
 class PretrainedModel:
-    def __init__(self, model: nn.Module, data: GraphData, pre_task):
+    def __init__(self, model: nn.Module, data: GraphData, ):
         self.dgl_model = model
         self._data = data
         self.graph = data.graph
-        self.pre_task = pre_task
 
     def predict_logits(self):
         return self.dgl_model(self.graph)
 
     def loss(self, criterion, features, mode):
         if mode == 'train':
-            #mask = self.graph.ndata['train_mask']
             mask = self._data.train_mask
         else:
             mask = self._data.test_mask

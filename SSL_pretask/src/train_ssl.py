@@ -8,6 +8,7 @@ import dgl
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 
+import ssl_utils
 from metric import accuracy, roc_auc_compute_fn
 
 from earlystopping import EarlyStopping
@@ -261,9 +262,9 @@ def train_epoch(args, model, sampler, labels, early_stopping, scheduler, optimiz
     val_t = time.time() - val_t
 
     try:
-        return (loss_train.item(), acc_train.item(), loss_val, acc_val, loss_ssl.item(), loss_total.item(), train_t)
+        return loss_train.item(), acc_train.item(), loss_val, acc_val, loss_ssl.item(), loss_total.item(), train_t
     except:
-        return (loss_train.item(), acc_train.item(), loss_val, acc_val, loss_ssl, loss_total.item(), train_t)
+        return loss_train.item(), acc_train.item(), loss_val, acc_val, loss_ssl, loss_total.item(), train_t
 
 
 def test(args, model, test_adj, test_fea, labels, idx_test):
@@ -393,12 +394,12 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
         # no sampling
         # randomedge sampling if args.sampling_percent >= 1.0, it behaves the same as stub_sampler.
 
-
         train_adj_2 = graph.adj()
         train_fea_2 = graph.ndata['feat']
 
         train_adj, train_fea = ssl_agent.transform_data()
-        train_adj, train_fea = train_adj_2,train_fea_2
+        # todo for dgl dataset
+        # train_adj, train_fea = train_adj_2,train_fea_2
 
         # (train_adj, train_fea) = sampler.randomedge_sampler(percent=args.sampling_percent, normalization=args.normalization, cuda=args.cuda)
         if args.mixmode:
@@ -480,7 +481,7 @@ def test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, los
         tb_writer.close()
 
 
-def main():
+def get_pre_trained_model(label):
     args = get_arguments()
     # dbs = ['cora', 'citeseer', 'pubmed']
     # for db in dbs:
@@ -497,13 +498,10 @@ def main():
                                                                optimizer, sampler, labels, scheduler,
                                                                early_stopping, idx_val, tb_writer)
     test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val)
-    return
+    data = ssl_utils.GraphData(sampler, label, args.cuda)
+    return ssl_utils.PretrainedModel(model, data, ssl_agent)
 
 
-def get_pre_trained_model():
-    pass
-
-
-if __name__ == '__main__':
-    main()
-main()
+# if __name__ == '__main__':
+#     main()
+# main()

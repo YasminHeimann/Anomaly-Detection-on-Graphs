@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class CompactnessLoss(nn.Module):
     def __init__(self, center):
         super(CompactnessLoss, self).__init__()

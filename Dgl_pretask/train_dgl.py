@@ -97,7 +97,7 @@ def parse_args():
     # parser.add_argument('--diag_path', default='./data/fisher_diagonal.pth', help='fim diagonal path')
     # parser.add_argument('--ewc', default=False, action='store_true', help='Train with EWC')
     parser.add_argument('--epochs', default=100, type=int, metavar='epochs', help='number of epochs')
-    parser.add_argument('--label', default=0, type=int, help='The normal class')
+    # parser.add_argument('--label', default=0, type=int, help='The normal class')
     parser.add_argument('--lr', type=float, default=1e-2, help='The initial learning rate.')
 
     parser.add_argument('--model', default='gcn', type=str, help='which architecture to use')
@@ -106,10 +106,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_pre_trained_model():
+def get_pre_trained_model(label):
     args = parse_args()
     print('Dataset: {}, Model Architecture: {}, LR: {}'.format(args.dataset, args.model, args.lr))
     model, g, dataset = get_model(args)
-    data = dgl_utils.GraphData(g, dataset, args)
-    return dgl_utils.PretrainedModel(model, data, args.task)
+    data = dgl_utils.GraphData(g, dataset, label)
+    return dgl_utils.PretrainedModel(model, data)
 

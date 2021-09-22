@@ -69,8 +69,8 @@ class PandaArguments:
     epochs = 50
     lr = 1e-2
     ewc = False
-    pre_task = 'dgl'  # or ssl
-
+    pre_task = 'ssl'  # ssl/ dgl
+    label = 0
     # dataset = 'cora'
     # model = 'gcn'
     # task = 'node_class'

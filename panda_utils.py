@@ -58,7 +58,7 @@ def clip_gradient(optimizer, grad_clip):
 
 def get_pretrained_model(args):
     if args.pre_task == 'dgl':
-        return dgl_task.get_pre_trained_model()
+        return dgl_task.get_pre_trained_model(args.label)
     if args.pre_task == 'ssl':
-        return ssl_task.get_pre_trained_model()
+        return ssl_task.get_pre_trained_model(args.label)
 
