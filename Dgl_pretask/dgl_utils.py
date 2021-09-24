@@ -81,7 +81,7 @@ class GraphData:
 
 
 class PretrainedModel:
-    def __init__(self, model: nn.Module, data: GraphData, ):
+    def __init__(self, model: nn.Module, data: GraphData):
         self.dgl_model = model
         self._data = data
         self.graph = data.graph
@@ -110,6 +110,10 @@ class PretrainedModel:
     @property
     def model(self):
         return self.dgl_model
+
+    @property
+    def task(self):
+        return 'dgl'
 
     def parameters(self):
         return self.dgl_model.parameters()

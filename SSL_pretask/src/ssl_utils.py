@@ -389,10 +389,11 @@ from torch import nn
 
 
 class PretrainedModel:
-    def __init__(self, model: nn.Module, data: GraphData, ssl_agent):
+    def __init__(self, model: nn.Module, data: GraphData, ssl_agent, ssl_task):
         self._ssl_agent = ssl_agent
         self.ssl_model = model
         self._data = data
+        self._ssl_task = ssl_task
 
     def predict_logits(self):
         # todo take embedding before log_softmax? to call regular forward?
@@ -423,6 +424,10 @@ class PretrainedModel:
     def model(self):
         return self.ssl_model
 
+    @property
+    def task(self):
+        return self._ssl_task
+
     def parameters(self):
         return self.ssl_model.parameters()
 
@@ -435,5 +440,10 @@ class PretrainedModel:
     def to(self, device):
         self.ssl_model.to(device)
 
+    def save(self):
+        pass
+
+    def load(self):
+        pass
 
 

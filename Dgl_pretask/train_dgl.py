@@ -106,7 +106,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_pre_trained_model(label):
+def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
     args = parse_args()
     print('Dataset: {}, Model Architecture: {}, LR: {}'.format(args.dataset, args.model, args.lr))
     model, g, dataset = get_model(args)

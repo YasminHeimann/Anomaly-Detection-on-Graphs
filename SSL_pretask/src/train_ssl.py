@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import time
 import argparse
+import json
 
 import dgl
 import torch.optim as optim
@@ -35,7 +36,7 @@ def get_arguments():
     parser.add_argument('--fastmode', action='store_true', default=False,
                         help='Disable validation during training.')
     parser.add_argument('--seed', type=int, default=42, help='Random seed.')
-    parser.add_argument('--epochs', type=int, default=800,
+    parser.add_argument('--epochs', type=int, default=400,  # 800
                         help='Number of epochs to train.')
     parser.add_argument('--lr', type=float, default=0.02,
                         help='Initial learning rate.')
@@ -131,14 +132,10 @@ def set_sampler(args) -> Sampler:
     return Sampler(args.dataset, args, args.datapath, args.task_type)
 
 
-def set_model(args, sampler):
-    # get labels and indexes
-    labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(args.cuda)
+def set_model(args, sampler, path=""):
     nfeat = sampler.nfeat
     nclass = sampler.nclass
-    print("nclass: %d\tnfea:%d" % (nclass, nfeat))
-
-    # The model
+    print("nclass: %d\tnfeat:%d" % (nclass, nfeat))
     model = GCNModel(nfeat=nfeat,
                      nhid=args.hidden,
                      nclass=nclass,
@@ -153,21 +150,29 @@ def set_model(args, sampler):
                      withloop=args.withloop,
                      aggrmethod=args.aggrmethod,
                      mixmode=args.mixmode)
+    if path != "":
+        # load existing model
+        print("Loading existing model: ", path)
+        checkpoint = torch.load(path)  # todo
+        model.load_state_dict(checkpoint['model_state_dict'])
+    return model
 
+
+def set_optimizer_scheduler(model, args, sampler):
     optimizer = optim.Adam(model.parameters(),
                            lr=args.lr, weight_decay=args.weight_decay)
-
     # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=50, factor=0.618)
     # scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[200, 300, 400, 500, 600, 700], gamma=0.5)
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[100000], gamma=1)
-    # convert to cuda
 
+    # convert to cuda
     if args.cuda:
         model.cuda()
     if args.ssl is None or args.lambda_ == 0:
         args.ssl = 'Base'
 
     # For the mix mode, lables and indexes are in cuda.
+    labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(args.cuda)
     if args.cuda or args.mixmode:
         labels = labels.cuda()
         idx_train = idx_train.cuda()
@@ -179,7 +184,7 @@ def set_model(args, sampler):
         print("Restore checkpoint from %s" % (early_stopping.fname))
         model.load_state_dict(early_stopping.load_checkpoint())
 
-    return model, optimizer, scheduler, labels, idx_train, idx_val, idx_test
+    return optimizer, scheduler
 
 
 def set_early_stopping(args):
@@ -291,7 +296,8 @@ def test(args, model, test_adj, test_fea, labels, idx_test):
     return (loss_test.item(), acc_test.item())
 
 
-def get_agent_by_task(args, sampler, labels, model, idx_train, optimizer):
+def get_agent_by_task(args, sampler, model, optimizer):
+    labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(args.cuda)
     ssl_agent = None
     nclass = max(labels).item() + 1
 
@@ -373,7 +379,7 @@ def get_agent_by_task(args, sampler, labels, model, idx_train, optimizer):
     return ssl_agent, optimizer
 
 
-def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, scheduler, early_stopping, idx_val, tb_writer):
+def train(args, ssl_agent, model, optimizer, sampler, scheduler, early_stopping, tb_writer):
     # Train model
     t_total = time.time()
     loss_train = np.zeros((args.epochs,))
@@ -381,10 +387,11 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
     loss_val = np.zeros((args.epochs,))
     acc_val = np.zeros((args.epochs,))
     loss_ssl = np.zeros((args.epochs,))
+    labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(args.cuda)
 
     sampling_t = 0
-    dataset = dgl.data.CoraGraphDataset()
-    graph = dataset[0]
+    # dataset = dgl.data.CoraGraphDataset()
+    # graph = dataset[0]
     for epoch in range(args.epochs):
         if args.alpha != 0:
             ssl_agent.label_correction = True
@@ -394,8 +401,8 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
         # no sampling
         # randomedge sampling if args.sampling_percent >= 1.0, it behaves the same as stub_sampler.
 
-        train_adj_2 = graph.adj()
-        train_fea_2 = graph.ndata['feat']
+        # train_adj_2 = graph.adj()
+        # train_fea_2 = graph.ndata['feat']
 
         train_adj, train_fea = ssl_agent.transform_data()
         # todo for dgl dataset
@@ -462,8 +469,9 @@ def train(args, idx_train, ssl_agent, model, optimizer, sampler, labels, schedul
 
 
 # Testing
-def test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val):
+def test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val):
     (test_adj, test_fea) = sampler.get_test_set(normalization=args.normalization, cuda=args.cuda)
+    labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(args.cuda)
 
     if args.mixmode:
         test_adj = test_adj.cuda()
@@ -481,27 +489,52 @@ def test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, los
         tb_writer.close()
 
 
-def get_pre_trained_model(label):
-    args = get_arguments()
-    # dbs = ['cora', 'citeseer', 'pubmed']
-    # for db in dbs:
-    #     print("--------DB:", db, "--------")
-    #     args.dataset = db
+def load_args(path):
+    # load model arguments
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+    args_file = path.split('.pt')[0] + "_cmd_args.txt"
+    with open(args_file, 'r') as f:
+        args.__dict__ = json.load(f)
+    print("dataset: ", args.dataset, ". ssl task: ", args.ssl)
+    return args
+
+
+def save_model(base_path, args, model, optimizer, loss_train):
+    print("saving model:", args.ssl, "on dataset: ", args.dataset)
+    # save model
+    save_path = base_path + args.ssl + "_" + args.dataset
+    model_path = save_path + ".pt"
+    torch.save({'epoch': args.epochs, 'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(), 'loss': loss_train},
+               model_path)
+    # save arguments
+    args_file_name = save_path + "_cmd_args.txt"
+    with open(args_file_name, 'w') as f:
+        json.dump(args.__dict__, f, indent=2)
+
+
+def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
+    if model_path == "":
+        args = get_arguments()
+    else:
+        args = load_args(model_path)
     pre_setting(args)
     sampler = set_sampler(args)
-    model, optimizer, scheduler, labels, idx_train, idx_val, idx_test = set_model(args, sampler)
     # todo: check early stopping from set model?
     early_stopping, tb_writer = set_early_stopping(args)
 
-    ssl_agent, optimizer = get_agent_by_task(args, sampler, labels, model, idx_train, optimizer)
-    loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, idx_train, ssl_agent, model,
-                                                               optimizer, sampler, labels, scheduler,
-                                                               early_stopping, idx_val, tb_writer)
-    test_model(args, model, labels, idx_test, sampler, tb_writer, idx_train, loss_train, loss_val, acc_train, acc_val)
+    model = set_model(args, sampler, path=model_path)
+    optimizer, scheduler = set_optimizer_scheduler(model, args, sampler)
+
+    ssl_agent, optimizer = get_agent_by_task(args, sampler, model, optimizer)
+    if model_path == "":  # the model needs to be trained and was not loaded
+        loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, ssl_agent, model,
+                                                               optimizer, sampler, scheduler,
+                                                               early_stopping, tb_writer)
+        test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val)
+        if to_save:
+            save_model(save_path, args, model, optimizer, loss_train)
     data = ssl_utils.GraphData(sampler, label, args.cuda)
-    return ssl_utils.PretrainedModel(model, data, ssl_agent)
+    return ssl_utils.PretrainedModel(model, data, ssl_agent, args.ssl)
 
-
-# if __name__ == '__main__':
-#     main()
-# main()

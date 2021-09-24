@@ -56,9 +56,17 @@ def clip_gradient(optimizer, grad_clip):
             param.grad.data.clamp_(-grad_clip, grad_clip)
 
 
-def get_pretrained_model(args):
+def get_pretrained_model(args, base_path, save_model=True):
+    ssl_models = ["PairwiseDistance_citeseer"]  # ["PairwiseDistance_cora", "Base_cora"]
+    end = ".pt"
     if args.pre_task == 'dgl':
-        return dgl_task.get_pre_trained_model(args.label)
+        return dgl_task.get_pre_trained_model(args.label, model_path="", save_path="", to_save=False)
     if args.pre_task == 'ssl':
-        return ssl_task.get_pre_trained_model(args.label)
+        if save_model:
+            return ssl_task.get_pre_trained_model(args.label, model_path="", save_path=base_path, to_save=True)
+        else:
+            for ssl in ssl_models:
+                saved = base_path + ssl + end
+                # load existing model
+                return ssl_task.get_pre_trained_model(args.label, model_path=saved, save_path="", to_save=False)
 

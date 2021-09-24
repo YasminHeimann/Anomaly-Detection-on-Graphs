@@ -28,7 +28,10 @@ def train_panda_model(data, model, device, args, ewc_loss, num_classes):
     model.eval()  # todo
     auc, train_feature_space = panda_utils.get_score(data, model, device, num_classes)
     print('Epoch: {}, AUROC is: {}'.format(0, auc))
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=0.00005, momentum=0.9)
+    # todo
+    #optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=0.00005, momentum=0.9)
+    #optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=0.00005, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     center = torch.FloatTensor(train_feature_space).mean(dim=0)
     criterion = CompactnessLoss(center.to(device))
@@ -45,10 +48,38 @@ def train_panda_model(data, model, device, args, ewc_loss, num_classes):
     return run_loss, auroc
 
 
+def plot_results(args, task, auroc, run_loss):
+    import matplotlib.pyplot as plt
+    # Data for plotting
+    x = list(range(1, args.epochs + 1))
+
+    fig, ax = plt.subplots()
+    ax.plot(x, auroc)
+
+    ax.set(xlabel='ephocs', ylabel='AUROC',
+           title='GNN+PANDA AUROC')
+    ax.grid()
+
+    auc_name = args.base_path + task + "_" + "auc.png"
+    fig.savefig(auc_name)
+    plt.show()
+    plt.clf()
+
+    fig1, ax1 = plt.subplots()
+    ax1.plot(x, run_loss)
+
+    ax1.set(xlabel='ephocs', ylabel='AUROC',
+            title='GNN+PANDA Training Loss')
+    ax1.grid()
+    loss_name = args.base_path + task + "_" + "loss_curve.png"
+    fig1.savefig(loss_name)
+    plt.show()
+
+
 def main(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)
-    model = panda_utils.get_pretrained_model(args)
+    model = panda_utils.get_pretrained_model(args, args.base_path, save_model=args.save_model)
     model.to(device)  # todo, should it be model = model.to(device)
 
     ewc_loss = None
@@ -62,15 +93,18 @@ def main(args):
 
     # panda_utils.freeze_parameters(model)  # todo - what does it mean here?
 
-    train_panda_model(model.data, model, device, args, ewc_loss, 2) #model.data.num_classes)
+    run_loss, auroc = train_panda_model(model.data, model, device, args, ewc_loss, 2) #model.data.num_classes)
+    plot_results(args, model.task, auroc, run_loss)
 
 
 class PandaArguments:
     epochs = 50
     lr = 1e-2
     ewc = False
-    pre_task = 'ssl'  # ssl/ dgl
+    pre_task = 'ssl'  # ssl/ dgl # todo
     label = 0
+    save_model = False  # todo
+    base_path = "./pre_trained_models/400_epochs/model_"
     # dataset = 'cora'
     # model = 'gcn'
     # task = 'node_class'
@@ -81,7 +115,5 @@ class PandaArguments:
 
 if __name__ == "__main__":
     panda_args = PandaArguments()
-    # args = parse_args()
-
     main(panda_args)
 
