@@ -7,6 +7,12 @@ import Dgl_pretask.train_dgl as dgl_task
 import SSL_pretask.src.train_ssl as ssl_task
 
 
+def freeze_model(model):
+    for param in model.parameters():
+        param.requires_grad = False
+    return
+
+
 # https://gist.github.com/JosueCom/7e89afc7f30761022d7747a501260fe3
 def knn_score(train_set, test_set, n_neigh=2):
     """
@@ -56,17 +62,15 @@ def clip_gradient(optimizer, grad_clip):
             param.grad.data.clamp_(-grad_clip, grad_clip)
 
 
-def get_pretrained_model(args, base_path, save_model=True):
-    ssl_models = ["PairwiseDistance_citeseer"]  # ["PairwiseDistance_cora", "Base_cora"]
-    end = ".pt"
+def get_pretrained_model(args, base_path, ssl_model=None, save_model=False):
     if args.pre_task == 'dgl':
         return dgl_task.get_pre_trained_model(args.label, model_path="", save_path="", to_save=False)
     if args.pre_task == 'ssl':
         if save_model:
             return ssl_task.get_pre_trained_model(args.label, model_path="", save_path=base_path, to_save=True)
         else:
-            for ssl in ssl_models:
-                saved = base_path + ssl + end
-                # load existing model
-                return ssl_task.get_pre_trained_model(args.label, model_path=saved, save_path="", to_save=False)
+            end = ".pt"
+            saved = base_path + ssl_model + end
+            # load existing model
+            return ssl_task.get_pre_trained_model(args.label, model_path=saved, save_path="", to_save=False)
 

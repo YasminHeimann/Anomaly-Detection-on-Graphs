@@ -98,7 +98,7 @@ def load_nell(dataset="nell.0.001", normalization="AugNormAdj", porting_to_torch
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
 
     if task_type == "full":
-        print("Load full supervised task.")
+        # print("Load full supervised task.")
         #supervised setting
         idx_test = test_idx_range.tolist()
         idx_train = range(len(ally)- 500)

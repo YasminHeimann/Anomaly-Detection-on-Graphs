@@ -1,0 +1,183 @@
+C:\Users\Yasmin\PycharmProjects\Graph_Anomaly\venv_ssl\Scripts\python.exe C:/Users/Yasmin/PycharmProjects/Graph_Anomaly/panda.py --datapath C:\Users\Yasmin\PycharmProjects\Graph_Anomaly\SelfTask-GNN\data --lambda 1 --dataset cora --ssl EdgeMask --epochs 100
+Using backend: pytorch
+Analysing ssl tasks
+running on:  pubmed EdgeMask
+Load full supervised task.
+nclass: 3	nfeat:500
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.3557 auc= 0.9632 accuracy= 0.8710
+accuracy=0.87100
+0.373354	0.000000	0.355661	0.860515	0.000000	0.871000
+Self-Supervised Type: EdgeMask
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=100, fastmode=False, hidden=128, inputlayer='gcn', lambda_=5, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='EdgeMask', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538
+saving model: EdgeMask on dataset:  pubmed
+running on:  pubmed PairwiseDistance
+Load full supervised task.
+nclass: 3	nfeat:500
+=== Number of Total Layers is 3 ===
+tensor(1.3867, grad_fn=<NllLossBackward>)
+tensor(1.3804, grad_fn=<NllLossBackward>)
+tensor(1.3691, grad_fn=<NllLossBackward>)
+tensor(1.3545, grad_fn=<NllLossBackward>)
+tensor(1.3377, grad_fn=<NllLossBackward>)
+tensor(1.3169, grad_fn=<NllLossBackward>)
+tensor(1.2974, grad_fn=<NllLossBackward>)
+tensor(1.2827, grad_fn=<NllLossBackward>)
+tensor(1.2625, grad_fn=<NllLossBackward>)
+tensor(1.2480, grad_fn=<NllLossBackward>)
+tensor(1.2498, grad_fn=<NllLossBackward>)
+tensor(1.2338, grad_fn=<NllLossBackward>)
+tensor(1.2340, grad_fn=<NllLossBackward>)
+tensor(1.2300, grad_fn=<NllLossBackward>)
+tensor(1.2271, grad_fn=<NllLossBackward>)
+tensor(1.2209, grad_fn=<NllLossBackward>)
+tensor(1.2235, grad_fn=<NllLossBackward>)
+tensor(1.2147, grad_fn=<NllLossBackward>)
+tensor(1.2076, grad_fn=<NllLossBackward>)
+tensor(1.2111, grad_fn=<NllLossBackward>)
+tensor(1.2027, grad_fn=<NllLossBackward>)
+tensor(1.2025, grad_fn=<NllLossBackward>)
+tensor(1.1991, grad_fn=<NllLossBackward>)
+tensor(1.2012, grad_fn=<NllLossBackward>)
+tensor(1.1988, grad_fn=<NllLossBackward>)
+tensor(1.2006, grad_fn=<NllLossBackward>)
+tensor(1.1989, grad_fn=<NllLossBackward>)
+tensor(1.1917, grad_fn=<NllLossBackward>)
+tensor(1.1856, grad_fn=<NllLossBackward>)
+tensor(1.1960, grad_fn=<NllLossBackward>)
+tensor(1.1869, grad_fn=<NllLossBackward>)
+tensor(1.1908, grad_fn=<NllLossBackward>)
+tensor(1.1897, grad_fn=<NllLossBackward>)
+tensor(1.1781, grad_fn=<NllLossBackward>)
+tensor(1.1833, grad_fn=<NllLossBackward>)
+tensor(1.1769, grad_fn=<NllLossBackward>)
+tensor(1.1787, grad_fn=<NllLossBackward>)
+tensor(1.1698, grad_fn=<NllLossBackward>)
+tensor(1.1776, grad_fn=<NllLossBackward>)
+tensor(1.1707, grad_fn=<NllLossBackward>)
+tensor(1.1786, grad_fn=<NllLossBackward>)
+tensor(1.1751, grad_fn=<NllLossBackward>)
+tensor(1.1691, grad_fn=<NllLossBackward>)
+tensor(1.1653, grad_fn=<NllLossBackward>)
+tensor(1.1660, grad_fn=<NllLossBackward>)
+tensor(1.1687, grad_fn=<NllLossBackward>)
+tensor(1.1649, grad_fn=<NllLossBackward>)
+tensor(1.1615, grad_fn=<NllLossBackward>)
+tensor(1.1648, grad_fn=<NllLossBackward>)
+tensor(1.1605, grad_fn=<NllLossBackward>)
+tensor(1.1657, grad_fn=<NllLossBackward>)
+tensor(1.1573, grad_fn=<NllLossBackward>)
+tensor(1.1614, grad_fn=<NllLossBackward>)
+tensor(1.1631, grad_fn=<NllLossBackward>)
+tensor(1.1598, grad_fn=<NllLossBackward>)
+tensor(1.1644, grad_fn=<NllLossBackward>)
+tensor(1.1509, grad_fn=<NllLossBackward>)
+tensor(1.1570, grad_fn=<NllLossBackward>)
+tensor(1.1626, grad_fn=<NllLossBackward>)
+tensor(1.1605, grad_fn=<NllLossBackward>)
+tensor(1.1520, grad_fn=<NllLossBackward>)
+tensor(1.1556, grad_fn=<NllLossBackward>)
+tensor(1.1517, grad_fn=<NllLossBackward>)
+tensor(1.1546, grad_fn=<NllLossBackward>)
+tensor(1.1492, grad_fn=<NllLossBackward>)
+tensor(1.1515, grad_fn=<NllLossBackward>)
+tensor(1.1504, grad_fn=<NllLossBackward>)
+tensor(1.1506, grad_fn=<NllLossBackward>)
+tensor(1.1496, grad_fn=<NllLossBackward>)
+tensor(1.1558, grad_fn=<NllLossBackward>)
+tensor(1.1508, grad_fn=<NllLossBackward>)
+tensor(1.1487, grad_fn=<NllLossBackward>)
+tensor(1.1480, grad_fn=<NllLossBackward>)
+tensor(1.1413, grad_fn=<NllLossBackward>)
+tensor(1.1494, grad_fn=<NllLossBackward>)
+tensor(1.1565, grad_fn=<NllLossBackward>)
+tensor(1.1546, grad_fn=<NllLossBackward>)
+tensor(1.1437, grad_fn=<NllLossBackward>)
+tensor(1.1449, grad_fn=<NllLossBackward>)
+tensor(1.1433, grad_fn=<NllLossBackward>)
+tensor(1.1490, grad_fn=<NllLossBackward>)
+tensor(1.1475, grad_fn=<NllLossBackward>)
+tensor(1.1473, grad_fn=<NllLossBackward>)
+tensor(1.1425, grad_fn=<NllLossBackward>)
+tensor(1.1491, grad_fn=<NllLossBackward>)
+tensor(1.1485, grad_fn=<NllLossBackward>)
+tensor(1.1379, grad_fn=<NllLossBackward>)
+tensor(1.1541, grad_fn=<NllLossBackward>)
+tensor(1.1395, grad_fn=<NllLossBackward>)
+tensor(1.1480, grad_fn=<NllLossBackward>)
+tensor(1.1447, grad_fn=<NllLossBackward>)
+tensor(1.1341, grad_fn=<NllLossBackward>)
+tensor(1.1351, grad_fn=<NllLossBackward>)
+tensor(1.1444, grad_fn=<NllLossBackward>)
+tensor(1.1402, grad_fn=<NllLossBackward>)
+tensor(1.1378, grad_fn=<NllLossBackward>)
+tensor(1.1373, grad_fn=<NllLossBackward>)
+tensor(1.1330, grad_fn=<NllLossBackward>)
+tensor(1.1410, grad_fn=<NllLossBackward>)
+tensor(1.1376, grad_fn=<NllLossBackward>)
+Test set results: loss= 0.3469 auc= 0.9646 accuracy= 0.8750
+accuracy=0.87500
+0.363999	0.000000	0.346862	0.868090	0.000000	0.875000
+Self-Supervised Type: PairwiseDistance
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=100, fastmode=False, hidden=128, inputlayer='gcn', lambda_=5, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='PairwiseDistance', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538
+saving model: PairwiseDistance on dataset:  pubmed
+running on:  pubmed PairwiseAttrSim
+Load full supervised task.
+nclass: 3	nfeat:500
+=== Number of Total Layers is 3 ===
+loading pubmed_3_attrsim_sampled_idx.npy
+number of sampled: 168056
+C:\Users\Yasmin\PycharmProjects\Graph_Anomaly\SSL_pretask\src\selfsl.py:632: UserWarning: Using a target size (torch.Size([5000])) that is different to the input size (torch.Size([5000, 1])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  loss = F.mse_loss(embeddings, self.pseudo_labels[sampled], reduction='mean')
+Test set results: loss= 0.3481 auc= 0.9647 accuracy= 0.8690
+accuracy=0.86900
+0.345080	0.000000	0.348052	0.875885	0.000000	0.869000
+Self-Supervised Type: PairwiseAttrSim
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=100, fastmode=False, hidden=128, inputlayer='gcn', lambda_=0.01, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='PairwiseAttrSim', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538
+saving model: PairwiseAttrSim on dataset:  pubmed
+running on:  pubmed Distance2Labeled
+Load full supervised task.
+nclass: 3	nfeat:500
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.3621 auc= 0.9633 accuracy= 0.8650
+accuracy=0.86500
+0.357093	0.000000	0.362080	0.869463	0.000000	0.865000
+Self-Supervised Type: Distance2Labeled
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=100, fastmode=False, hidden=128, inputlayer='gcn', lambda_=1, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=0, sampling_percent=1.0, seed=42, ssl='Distance2Labeled', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538
+saving model: Distance2Labeled on dataset:  pubmed
+running on:  pubmed AttributeMask
+Load full supervised task.
+nclass: 3	nfeat:256
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.3630 auc= 0.9609 accuracy= 0.8670
+accuracy=0.86700
+0.364780	0.000000	0.362983	0.865840	0.000000	0.867000
+Self-Supervised Type: AttributeMask~PCA
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=100, fastmode=False, hidden=128, inputlayer='gcn', lambda_=50, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=1, sampling_percent=1.0, seed=42, ssl='AttributeMask~PCA', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538
+saving model: AttributeMask~PCA on dataset:  pubmed
+running on:  pubmed NodeProperty
+Load full supervised task.
+nclass: 3	nfeat:256
+=== Number of Total Layers is 3 ===
+Test set results: loss= 0.3665 auc= 0.9600 accuracy= 0.8570
+accuracy=0.85700
+0.362104	0.000000	0.366483	0.867816	0.000000	0.857000
+Self-Supervised Type: NodeProperty~PCA
+Namespace(aggrmethod='add', alpha=1, cuda=False, datapath='C:\\Users\\Yasmin\\PycharmProjects\\Graph_Anomaly\\SelfTask-GNN\\data', dataset='pubmed', debug=False, dropout=0.5, early_stopping=0, epochs=100, fastmode=False, hidden=128, inputlayer='gcn', lambda_=0.1, lr=0.02, lradjust=False, mixmode=False, nbaseblocklayer=1, nhiddenlayer=1, no_cuda=True, no_tensorboard=True, normalization='AugNormAdj', outputlayer='gcn', param_searching=0, pca=1, sampling_percent=1.0, seed=42, ssl='NodeProperty~PCA', task_type='full', train_size=0, type='resgcn', warm_start='', weight_decay=0.0005, withbn=False, withloop=False, write_res=0)
+len(idx_train)/len(adj.shape[0])=  0.923923517776538
+saving model: NodeProperty~PCA on dataset:  pubmed
+[['EdgeMask', 'pubmed', 0.3556613326072693, 0.871], ['PairwiseDistance', 'pubmed', 0.3468616008758545, 0.875], ['PairwiseAttrSim', 'pubmed', 0.3480517566204071, 0.869], ['Distance2Labeled', 'pubmed', 0.362080454826355, 0.865], ['AttributeMask', 'pubmed', 0.3629830479621887, 0.867], ['NodeProperty', 'pubmed', 0.36648309230804443, 0.857]]
+
+task=EdgeMask, dataset=pubmed, test loss=0.3556613326072693, accuracy test=0.871
+task=PairwiseDistance, dataset=pubmed, test loss=0.3468616008758545, accuracy test=0.875
+task=PairwiseAttrSim, dataset=pubmed, test loss=0.3480517566204071, accuracy test=0.869
+task=Distance2Labeled, dataset=pubmed, test loss=0.362080454826355, accuracy test=0.865
+task=AttributeMask, dataset=pubmed, test loss=0.3629830479621887, accuracy test=0.867
+task=NodeProperty, dataset=pubmed, test loss=0.36648309230804443, accuracy test=0.857
+
+Process finished with exit code 0

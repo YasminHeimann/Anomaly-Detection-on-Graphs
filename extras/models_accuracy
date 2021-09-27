@@ -1,0 +1,17 @@
+[
+['EdgeMask', 'cora', 0.3556613326072693, 0.863], ['PairwiseDistance', 'cora', 0.3468616008758545, 0.876],
+['PairwiseAttrSim', 'cora', 0.3480517566204071, 0.864], ['Distance2Labeled', 'cora', 0.362080454826355, 0.86],
+['AttributeMask', 'cora', 0.3629830479621887, 0.843], ['NodeProperty', 'cora', 0.36648309230804443, 0.843]
+]
+
+[
+['EdgeMask', 'citeseer', 0.3556613326072693, 0.768], ['PairwiseDistance', 'citeseer', 0.3468616008758545, 0.779],
+['PairwiseAttrSim', 'citeseer', 0.3480517566204071, 0.763], ['Distance2Labeled', 'citeseer', 0.362080454826355, 0.768],
+['AttributeMask', 'citeseer', 0.3629830479621887, 0.763], ['NodeProperty', 'citeseer', 0.36648309230804443, 0.773]
+]
+
+[
+['EdgeMask', 'pubmed', 0.3556613326072693, 0.871], ['PairwiseDistance', 'pubmed', 0.3468616008758545, 0.875],
+['PairwiseAttrSim', 'pubmed', 0.3480517566204071, 0.869], ['Distance2Labeled', 'pubmed', 0.362080454826355, 0.865],
+['AttributeMask', 'pubmed', 0.3629830479621887, 0.867], ['NodeProperty', 'pubmed', 0.36648309230804443, 0.857]
+]

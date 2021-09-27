@@ -10,6 +10,6 @@ lambda_config = {
 'Distance2Labeled': {'cora': 100, 'citeseer': 10, 'pubmed': 1},
 'CombinedContextLabel': {'cora': 10, 'citeseer': 8, 'pubmed': 10},
 'EdgeMask': {'cora': 10, 'citeseer': 5, 'pubmed': 5},
-'PairwiseAttrSim': {'cora': 100, 'citeser': 5, 'pubmed': 0.01},
+'PairwiseAttrSim': {'cora': 100, 'citeseer': 5, 'pubmed': 0.01},
 }
 

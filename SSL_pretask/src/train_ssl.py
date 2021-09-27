@@ -51,7 +51,7 @@ def get_arguments():
     parser.add_argument('--debug', action='store_true',
                         default=False, help="Enable the detialed training output.")
     parser.add_argument('--dataset', default="cora", help="The data set")
-    # TODO change sata path
+    # TODO change data path
     parser.add_argument('--datapath', default="data/", help="The data path.")
     parser.add_argument("--early_stopping", type=int,
                         default=0,
@@ -89,7 +89,11 @@ def get_arguments():
                         help="The node classification task type (full and semi). Only valid for cora, citeseer and pubmed dataset.")
 
     args = parser.parse_args()
+    return args
 
+
+def pre_setting(args):
+    # pre setting
     if args.ssl == 'AttributeMask':
         args.pca = 1
 
@@ -99,11 +103,7 @@ def get_arguments():
     if args.lambda_ != 0 and args.ssl != 'Base' and not args.param_searching:
         from configs import lambda_config
         args.lambda_ = lambda_config[args.ssl][args.dataset]
-    return args
 
-
-def pre_setting(args):
-    # pre setting
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     args.mixmode = args.no_cuda and args.mixmode and torch.cuda.is_available()
     if args.aggrmethod == "default":
@@ -371,6 +371,7 @@ def get_agent_by_task(args, sampler, model, optimizer):
         ssl_agent = AttributeMask(sampler.adj, sampler.features, idx_train=idx_train, nhid=args.hidden, device=device)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
                                lr=args.lr, weight_decay=args.weight_decay)
+
     if args.ssl == 'NodeProperty':
         ssl_agent = NodeProperty(sampler.adj, sampler.features, nhid=args.hidden, device=device)
         optimizer = optim.Adam(list(model.parameters()) + list(ssl_agent.linear.parameters()),
@@ -464,6 +465,18 @@ def train(args, ssl_agent, model, optimizer, sampler, scheduler, early_stopping,
     if args.debug:
         print("Optimization Finished!")
         print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
+        x = list(range(1, len(loss_train) + 1))
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        ax.plot(x, loss_train)
+
+        title = 'ssl loss, task={}, epochs={}'.format(args.ssl, str(args.epochs))
+        ax.set(xlabel='ephocs', ylabel='loss',
+               title=title)
+        ax.grid()
+        plt.show()
+        plt.clf()
+        print(loss_train)
 
     return loss_train, acc_train, loss_val, acc_val, loss_ssl
 
@@ -487,6 +500,8 @@ def test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train,
 
     if not args.no_tensorboard:
         tb_writer.close()
+
+    return loss_test, acc_test
 
 
 def load_args(path):
@@ -514,11 +529,7 @@ def save_model(base_path, args, model, optimizer, loss_train):
         json.dump(args.__dict__, f, indent=2)
 
 
-def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
-    if model_path == "":
-        args = get_arguments()
-    else:
-        args = load_args(model_path)
+def run_ssl_model(args, model_path, save_path, to_save):
     pre_setting(args)
     sampler = set_sampler(args)
     # todo: check early stopping from set model?
@@ -530,11 +541,68 @@ def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
     ssl_agent, optimizer = get_agent_by_task(args, sampler, model, optimizer)
     if model_path == "":  # the model needs to be trained and was not loaded
         loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, ssl_agent, model,
-                                                               optimizer, sampler, scheduler,
-                                                               early_stopping, tb_writer)
-        test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val)
+                                                                   optimizer, sampler, scheduler,
+                                                                   early_stopping, tb_writer)
+        loss_test, acc_test = test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val)
         if to_save:
             save_model(save_path, args, model, optimizer, loss_train)
+    else:
+        loss_test, acc_test = 0, 0  # load from a log file
+    return model, ssl_agent, sampler, loss_test, acc_test
+
+
+def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
+    if model_path == "":
+        args = get_arguments()
+    else:
+        args = load_args(model_path)
+        args.ssl = args.ssl.split("~")[0]
+    model, ssl_agent, sampler, loss_test, acc_test = run_ssl_model(args, model_path, save_path, to_save)
     data = ssl_utils.GraphData(sampler, label, args.cuda)
     return ssl_utils.PretrainedModel(model, data, ssl_agent, args.ssl)
+
+
+def check_one_task_per_dataset(args, datasets):
+    results = []
+    for ds in datasets:
+        args.dataset = ds
+        print(args.dataset)
+        model, ssl_agent, sampler, loss_test, acc_test = run_ssl_model(args, model_path="",
+                                                                       save_path="", to_save=False)
+        results.append([ds, loss_test, acc_test])
+
+    for res in results:
+        print("task={}, dataset={}, test loss={}, accuracy test={}".format(args.ssl, res[0], res[1], res[2]))
+
+
+def save_models_for_best_params(args, datasets, tasks, save_path):
+    results = []
+    for ds in datasets:
+        args.dataset = ds
+        for task in tasks:
+            args.ssl = task
+            print("running on: ", args.dataset, args.ssl)
+            model, ssl_agent, sampler, loss_test, acc_test = run_ssl_model(args, model_path="",
+                                                                           save_path=save_path, to_save=True)
+            results.append([task, ds, loss_test, acc_test])
+
+    print(results)
+    for res in results:
+        print("task={}, dataset={}, test loss={}, accuracy test={}".format(res[0], res[1], res[2], res[3]))
+
+
+def analyse_ssl_tasks(save_path=""):
+    print("Analysing ssl tasks")
+    all_tasks = ["EdgeMask", "DistanceCluster", "PairwiseDistance", "PairwiseAttrSim",
+             "Distance2Labeled", "ICAContextLabel", "LPContextLabel", "CombinedContextLabel",
+             "AttributeMask", "NodeProperty"]
+
+    best_tasks = ["EdgeMask", "PairwiseDistance", "PairwiseAttrSim",
+                     "Distance2Labeled", "AttributeMask", "NodeProperty"]
+    datasets = ['pubmed', 'cora', 'citeseer']
+    final_losses, final_accuracy, final_roc = [], [], []
+
+    args = get_arguments()
+    # check_one_task_per_dataset(args, datasets)
+    save_models_for_best_params(args, datasets, best_tasks, save_path)
 
