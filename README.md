@@ -42,7 +42,7 @@ You can choose the task 'best', which then chooses the best task for the given d
 ```
 **Run the code**
 ```
-git clone https://github.com/YasminHeimann/Graph_Anomaly
+git clone https://github.com/YasminHeimann/Anomaly-Detection-on-Graphs
 cd Graph_Anomaly
 pip install -r requirements.txt
 ```
