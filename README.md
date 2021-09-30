@@ -44,5 +44,5 @@ You can choose the task 'best', which then chooses the best task for the given d
 ```
 git clone https://github.com/YasminHeimann/Anomaly-Detection-on-Graphs
 cd Graph_Anomaly
-pip install -r requirements.txt
+pip install -r requirements.txt 
 ```
