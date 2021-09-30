@@ -10,6 +10,12 @@ In this project, as the pretrained model (for features extraction), I used a bas
 and the models suggested in [Self-supervised Learning on Graphs:
 Deep Insights and New Directions](https://arxiv.org/pdf/2006.10141.pdf).
 
+**Project report**
+```angular2html
+Please find the paper named "Graph_Anomaly_Detection_Yasmin_Heimann.pdf",
+for the results and experiments done in this project.
+```
+
 **Github references**
 
 >PANDA github: [https://github.com/talreiss/PANDA](https://github.com/talreiss/PANDA)
@@ -43,6 +49,8 @@ You can choose the task 'best', which then chooses the best task for the given d
 **Run the code**
 ```
 git clone https://github.com/YasminHeimann/Anomaly-Detection-on-Graphs
-cd Graph_Anomaly
-pip install -r requirements.txt 
+cd Anomaly-Detection-on-Graphs
+pip install -r requirements.txt
+# change the args.csv file to match your desired parameters settings 
+python3 panda.py
 ```
