@@ -173,7 +173,7 @@ def load_citation(dataset_str="cora", normalization="AugNormAdj", porting_to_tor
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
 
     if task_type == "full":
-        print("Load full supervised task.")
+        #print("Load full supervised task.")
         #supervised setting
         idx_test = test_idx_range.tolist()
         idx_train = range(len(ally)- 500)

@@ -51,7 +51,6 @@ def get_arguments():
     parser.add_argument('--debug', action='store_true',
                         default=False, help="Enable the detialed training output.")
     parser.add_argument('--dataset', default="cora", help="The data set")
-    # TODO change data path
     parser.add_argument('--datapath', default="data/", help="The data path.")
     parser.add_argument("--early_stopping", type=int,
                         default=0,
@@ -128,7 +127,6 @@ def pre_setting(args):
 
 
 def set_sampler(args) -> Sampler:
-    # should we need fix random seed here?
     return Sampler(args.dataset, args, args.datapath, args.task_type)
 
 
@@ -153,7 +151,7 @@ def set_model(args, sampler, path=""):
     if path != "":
         # load existing model
         print("Loading existing model: ", path)
-        checkpoint = torch.load(path)  # todo
+        checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
     return model
 
@@ -221,8 +219,6 @@ def train_epoch(args, model, sampler, labels, early_stopping, scheduler, optimiz
 
     if 'ContextLabel' in args.ssl:
         output, embeddings = model.myforward(train_fea, train_adj, layer=1)
-    # elif 'Pairwise' in args.ssl:
-    #     output, embeddings = model.myforward(train_fea, train_adj, layer=1)
     else:
         output, embeddings = model.myforward(train_fea, train_adj, layer=1.5)
 
@@ -242,8 +238,6 @@ def train_epoch(args, model, sampler, labels, early_stopping, scheduler, optimiz
     train_t = time.time() - t
     val_t = time.time()
     # We can not apply the fastmode for the reddit dataset.
-    # if sampler.learning_type == "inductive" or not args.fastmode:
-
     # if args.early_stopping > 0 and sampler.dataset != "reddit":
     #     loss_val = F.nll_loss(output[idx_val], labels[idx_val]).item()
     #     early_stopping(loss_val, model)
@@ -406,7 +400,7 @@ def train(args, ssl_agent, model, optimizer, sampler, scheduler, early_stopping,
         # train_fea_2 = graph.ndata['feat']
 
         train_adj, train_fea = ssl_agent.transform_data()
-        # todo for dgl dataset
+        # for loading the dgl dataset
         # train_adj, train_fea = train_adj_2,train_fea_2
 
         # (train_adj, train_fea) = sampler.randomedge_sampler(percent=args.sampling_percent, normalization=args.normalization, cuda=args.cuda)
@@ -481,14 +475,13 @@ def train(args, ssl_agent, model, optimizer, sampler, scheduler, early_stopping,
     return loss_train, acc_train, loss_val, acc_val, loss_ssl
 
 
-# Testing
 def test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val):
     (test_adj, test_fea) = sampler.get_test_set(normalization=args.normalization, cuda=args.cuda)
     labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(args.cuda)
 
     if args.mixmode:
         test_adj = test_adj.cuda()
-    # todo here #################################################
+
     (loss_test, acc_test) = test(args, model, test_adj, test_fea, labels, idx_test)
     print("%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f" % (
         loss_train[-1], loss_val[-1], loss_test, acc_train[-1], acc_val[-1], acc_test))
@@ -502,64 +495,6 @@ def test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train,
         tb_writer.close()
 
     return loss_test, acc_test
-
-
-def load_args(path):
-    # load model arguments
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-    args_file = path.split('.pt')[0] + "_cmd_args.txt"
-    with open(args_file, 'r') as f:
-        args.__dict__ = json.load(f)
-    print("dataset: ", args.dataset, ". ssl task: ", args.ssl)
-    return args
-
-
-def save_model(base_path, args, model, optimizer, loss_train):
-    print("saving model:", args.ssl, "on dataset: ", args.dataset)
-    # save model
-    save_path = base_path + args.ssl + "_" + args.dataset
-    model_path = save_path + ".pt"
-    torch.save({'epoch': args.epochs, 'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(), 'loss': loss_train},
-               model_path)
-    # save arguments
-    args_file_name = save_path + "_cmd_args.txt"
-    with open(args_file_name, 'w') as f:
-        json.dump(args.__dict__, f, indent=2)
-
-
-def run_ssl_model(args, model_path, save_path, to_save):
-    pre_setting(args)
-    sampler = set_sampler(args)
-    # todo: check early stopping from set model?
-    early_stopping, tb_writer = set_early_stopping(args)
-
-    model = set_model(args, sampler, path=model_path)
-    optimizer, scheduler = set_optimizer_scheduler(model, args, sampler)
-
-    ssl_agent, optimizer = get_agent_by_task(args, sampler, model, optimizer)
-    if model_path == "":  # the model needs to be trained and was not loaded
-        loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, ssl_agent, model,
-                                                                   optimizer, sampler, scheduler,
-                                                                   early_stopping, tb_writer)
-        loss_test, acc_test = test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val)
-        if to_save:
-            save_model(save_path, args, model, optimizer, loss_train)
-    else:
-        loss_test, acc_test = 0, 0  # load from a log file
-    return model, ssl_agent, sampler, loss_test, acc_test
-
-
-def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
-    if model_path == "":
-        args = get_arguments()
-    else:
-        args = load_args(model_path)
-        args.ssl = args.ssl.split("~")[0]
-    model, ssl_agent, sampler, loss_test, acc_test = run_ssl_model(args, model_path, save_path, to_save)
-    data = ssl_utils.GraphData(sampler, label, args.cuda)
-    return ssl_utils.PretrainedModel(model, data, ssl_agent, args.ssl)
 
 
 def check_one_task_per_dataset(args, datasets):
@@ -593,16 +528,73 @@ def save_models_for_best_params(args, datasets, tasks, save_path):
 
 def analyse_ssl_tasks(save_path=""):
     print("Analysing ssl tasks")
-    all_tasks = ["EdgeMask", "DistanceCluster", "PairwiseDistance", "PairwiseAttrSim",
-             "Distance2Labeled", "ICAContextLabel", "LPContextLabel", "CombinedContextLabel",
-             "AttributeMask", "NodeProperty"]
+    # all_tasks = ["EdgeMask", "DistanceCluster", "PairwiseDistance", "PairwiseAttrSim",
+    #          "Distance2Labeled", "ICAContextLabel", "LPContextLabel", "CombinedContextLabel",
+    #          "AttributeMask", "NodeProperty"]
 
     best_tasks = ["EdgeMask", "PairwiseDistance", "PairwiseAttrSim",
-                     "Distance2Labeled", "AttributeMask", "NodeProperty"]
+                  "Distance2Labeled", "AttributeMask", "NodeProperty"]
     datasets = ['pubmed', 'cora', 'citeseer']
-    final_losses, final_accuracy, final_roc = [], [], []
 
     args = get_arguments()
     # check_one_task_per_dataset(args, datasets)
     save_models_for_best_params(args, datasets, best_tasks, save_path)
+
+
+def load_args(path):
+    # load model arguments
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+    args_file = path.split('.pt')[0] + "_cmd_args.txt"
+    with open(args_file, 'r') as f:
+        args.__dict__ = json.load(f)
+    print("dataset: ", args.dataset, ". ssl task: ", args.ssl)
+    return args
+
+
+def save_model(base_path, args, model, optimizer, loss_train):
+    print("saving model:", args.ssl, "on dataset: ", args.dataset)
+    # save model
+    save_path = base_path + args.ssl + "_" + args.dataset
+    model_path = save_path + ".pt"
+    torch.save({'epoch': args.epochs, 'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(), 'loss': loss_train},
+               model_path)
+    # save arguments
+    args_file_name = save_path + "_cmd_args.txt"
+    with open(args_file_name, 'w') as f:
+        json.dump(args.__dict__, f, indent=2)
+
+
+def run_ssl_model(args, model_path, save_path, to_save):
+    pre_setting(args)
+    sampler = set_sampler(args)
+
+    early_stopping, tb_writer = set_early_stopping(args)
+
+    model = set_model(args, sampler, path=model_path)
+    optimizer, scheduler = set_optimizer_scheduler(model, args, sampler)
+
+    ssl_agent, optimizer = get_agent_by_task(args, sampler, model, optimizer)
+    if model_path == "":  # the model needs to be trained and was not loaded
+        loss_train, acc_train, loss_val, acc_val, loss_ssl = train(args, ssl_agent, model,
+                                                                   optimizer, sampler, scheduler,
+                                                                   early_stopping, tb_writer)
+        loss_test, acc_test = test_model(args, model, sampler, tb_writer, loss_train, loss_val, acc_train, acc_val)
+        if to_save:
+            save_model(save_path, args, model, optimizer, loss_train)
+    else:
+        loss_test, acc_test = 0, 0  # load from a log file
+    return model, ssl_agent, sampler, loss_test, acc_test
+
+
+def get_pre_trained_model(label, model_path="", save_path="", to_save=True):
+    if model_path == "":
+        args = get_arguments()
+    else:
+        args = load_args(model_path)
+        args.ssl = args.ssl.split("~")[0]
+    model, ssl_agent, sampler, loss_test, acc_test = run_ssl_model(args, model_path, save_path, to_save)
+    data = ssl_utils.GraphData(sampler, label, args.cuda)
+    return ssl_utils.PretrainedModel(model, data, ssl_agent, args.ssl)
 

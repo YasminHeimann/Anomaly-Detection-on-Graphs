@@ -340,12 +340,8 @@ def get_splits_each_class(labels, train_size, seed=None):
 
 def get_data_one2many(sampler, label, cuda):
     full_labels, idx_train, idx_val, idx_test = sampler.get_label_and_idxes(cuda)
-    # todo : check if idx is a true-false array?
     train_labels = full_labels[idx_train]
     test_labels = full_labels[idx_test]
-
-    # full_labels = (test_labels.cpu().detach().numpy() > 0).astype(int)
-    # 0 - 1, 0 - 1,2,...9
 
     test_labels_final = (test_labels.cpu().detach().numpy() != label).astype(int)
     train_labels_final = (train_labels.cpu().detach().numpy() == label).astype(int)
@@ -377,7 +373,7 @@ class GraphData:
         return self.test_mask
 
     @property
-    def get_test_labels(self):  # todo: used in the panda.py, other in the model
+    def get_test_labels(self):
         return self.test_labels
 
     @property
@@ -396,10 +392,10 @@ class PretrainedModel:
         self._ssl_task = ssl_task
 
     def predict_logits(self):
-        # todo take embedding before log_softmax? to call regular forward?
         train_adj, train_feat = self._ssl_agent.transform_data()
         output, embeddings = self.ssl_model.myforward(train_feat, train_adj, layer=-1)
-        return output
+        # embedding with -1 is the last layer before the log softmax
+        return embeddings
 
     def loss(self, criterion, features, mode):
         # loss_train = F.nll_loss(features[idx_train], self._labels[idx_train])

@@ -1,0 +1,2 @@
+task,dataset,label,epochs,lr
+best,cora,0,125,0.1
